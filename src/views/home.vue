@@ -18,7 +18,7 @@ const fetchTests = async () => {
   }
 
   try {
-    const testCollection = collection(db, "fanlar", selectedFan.value, selectedDaraja.value, "testlar");
+    const testCollection = collection(db, "fanlar", selectedFan.value, selectedDaraja.value);
     const querySnapshot = await getDocs(testCollection);
     
     testlar.value = querySnapshot.docs.map((doc) => ({
