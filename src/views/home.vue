@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { db } from '../../firebase';
+import { db } from '../config/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 export default {
   data() {

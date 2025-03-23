@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { db } from "../../../firebase";
+import { db } from "../../config/firebase";
 import { collection, addDoc, doc } from "firebase/firestore";
 
 const fanlar = ref(["Matematika", "Ingliz tili", "Fizika"]);
