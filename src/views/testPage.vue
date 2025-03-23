@@ -81,8 +81,8 @@ label {
     margin-top: 20px;
     display: flex;
     justify-content: center;
-    flex-wrap: wrap; /* Kichik ekranlarda tugmalar yangi qatorda joylashadi */
-    gap: 10px; /* Tugmalar orasidagi bo'shliq */
+    flex-wrap: wrap; 
+    gap: 10px; 
 }
 
 .pagination-button {
@@ -106,11 +106,11 @@ label {
 .pagination-button:hover {
     background-color: #0056b3;
     color: white;
-    transform: translateY(-2px); /* Hover paytida tugma biroz yuqoriga ko'tariladi */
+    transform: translateY(-2px); 
 }
 
 .pagination-button:active {
-    transform: translateY(2px); /* Tugma bosilganda pastga tushadi */
+    transform: translateY(2px); 
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
