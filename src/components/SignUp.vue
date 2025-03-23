@@ -50,7 +50,7 @@ export default {
                 email: "",
                 password: "",
             },
-            showPassword: false, // Parolni ko'rish uchun flag
+            showPassword: false,
         };
     },
     methods: {
@@ -70,10 +70,9 @@ export default {
         },
         handleGoogleSignUp() {
             console.log("Google Sign Up clicked");
-            // Google Sign Up logikasini shu yerda qo'shing
         },
         togglePasswordVisibility() {
-            this.showPassword = !this.showPassword; // Parolni ko'rish yoki yashirish
+            this.showPassword = !this.showPassword; 
         },
     },
 };

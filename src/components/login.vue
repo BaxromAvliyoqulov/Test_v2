@@ -42,7 +42,7 @@ export default {
                 email: "",
                 password: "",
             },
-            showPassword: false, // Parolni ko'rish uchun flag
+            showPassword: false, 
         };
     },
     methods: {
@@ -53,7 +53,7 @@ export default {
             console.log("Google Login clicked");
         },
         togglePasswordVisibility() {
-            this.showPassword = !this.showPassword; // Parolni ko'rish yoki yashirish
+            this.showPassword = !this.showPassword; 
         },
     },
 };

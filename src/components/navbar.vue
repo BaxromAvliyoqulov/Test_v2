@@ -1,14 +1,15 @@
 <template>
     <div class="navbar">
         <div class="logo">
-            <h1>Test.me</h1>
+            <h1 @click="$router.push('/')" >Test.me</h1>
         </div>
         <div class="profile">
             <img src="../assets/img/user.png" @click="toggleDropdown" class="profile-image" alt="User Avatar">
             <div v-if="dropdownOpen" class="dropdown-content">
                 <a href="/points">Points</a>
-                <a href="/dashboard">Dashboard</a>
+                <a href="/about">About Us</a>
                 <a href="/contact-us">Contact Us</a>
+                <a href="/dashboard">Dashboard</a>
                 <hr class="custom-hr">
                 <a href="/logout">Log Out</a>
             </div>
@@ -37,11 +38,13 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 0 30px;
+    width: 95%;
     height: 70px;
+    margin: 0 auto;
     background: linear-gradient(145deg, #0056b3, #007bff); 
     color: white;
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.1); 
-    border-radius: 10px; 
+    border-radius: 10px ;
 }
 
 .navbar h1 {
@@ -49,7 +52,8 @@ export default {
     font-size: 26px;
     font-weight: bold;
     color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Matn uchun 3D effekt */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
 }
 
 .profile-image {
