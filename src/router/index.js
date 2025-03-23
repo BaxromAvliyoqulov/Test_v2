@@ -1,8 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import home from "@/views/home.vue";
-import testPage from "@/views/testPage.vue";
-
+const Login = () => import('@/components/login.vue');
+const SignUP = () => import('@/components/SignUp.vue');
+const testPage = () => import("@/views/testPage.vue");
+const admin = () => import('@/views/admin/index.vue')
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes: [
@@ -12,10 +14,25 @@ const router = createRouter({
 			component: home,
 		},
 		{
-            path: "/test", 
-            name: "testPage",
-            component: testPage,
-        },
+			path: "/test",
+			name: "testPage",
+			component: testPage,
+		},
+		{
+			path: '/admin',
+			name: 'admin',
+			component: admin
+		},
+		{
+			path: '/login',
+			name: 'login',
+			component: Login
+		},
+		{
+			path: '/SignUp',
+			name: 'SignUp',
+			component: SignUP
+		}
 	],
 });
 
