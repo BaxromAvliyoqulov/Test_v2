@@ -3,41 +3,19 @@
     <div class="logo">
       <h1 @click="navigateTo('/')">Test.me</h1>
     </div>
-    <div class="profile-container">
-      <!-- Добавляем отображение имени пользователя -->
-      <div class="username-display" v-if="username">
-        Welcome, {{ username }}
-      </div>
-      <div class="profile" ref="profileDropdown">
-        <div class="profile-image-container">
-          <img 
-            :src="profileImage" 
-            @click="toggleDropdown" 
-            class="profile-image" 
-            alt="User Avatar"
-          >
-          <!-- Добавляем кнопку для загрузки новой фотографии -->
-          <input 
-            type="file" 
-            ref="fileInput" 
-            @change="handleImageUpload" 
-            accept="image/*" 
-            style="display: none"
-          >
-          <button class="change-photo-btn" @click="triggerFileInput">
-            <i class="fas fa-camera"></i>
-          </button>
+    <div class="profile">
+      <img 
+        :src="profileImage" 
+        @click="toggleDropdown" 
+        class="profile-image" 
+        alt="User Avatar"
+      >
+      <div v-if="dropdownOpen" class="dropdown-content">
+        <div class="user-info" v-if="username">
+          <img :src="profileImage" class="dropdown-profile-image" alt="User Avatar">
+          <span class="dropdown-username">{{ username }}</span>
         </div>
-        <div v-if="dropdownOpen" class="dropdown-content">
-          <div class="user-info">
-            <img :src="profileImage" class="mini-profile-image" alt="User Avatar">
-            <div class="user-details">
-              <span class="username">{{ username || 'User' }}</span>
-              <span class="email">{{ userEmail }}</span>
-            </div>
-          </div>
-          <hr class="custom-hr">
-          <!-- Остальные пункты меню -->
+        <div class="dropdown-links">
           <router-link to="/points">Points</router-link>
           <router-link to="/about">About Us</router-link>
           <router-link to="/contact-us">Contact Us</router-link>
@@ -51,86 +29,97 @@
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
-import defaultUserImage from '../assets/img/user.png'
+import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
+// O'zingizning user.png rasmingizni import qiling
+import defaultUserImage from '../assets/img/user.png';
 
 export default {
-  name: 'Navbar',
-  setup() {
-    const router = useRouter()
-    const dropdownOpen = ref(false)
-    const username = ref(null)
-    const profileImage = ref(defaultUserImage)
-    const isMobile = ref(false)
-    const profileDropdown = ref(null)
-
-    const navigateTo = (path) => {
-      router.push(path)
-      dropdownOpen.value = false
-    }
-
-    const toggleDropdown = () => {
-      dropdownOpen.value = !dropdownOpen.value
-    }
-
-    const checkUserLogin = () => {
-      try {
-        const user = JSON.parse(localStorage.getItem('user'))
-        if (user) {
-          username.value = user.displayName || user.name || 'User'
-          if (user.photoURL) {
-            profileImage.value = user.photoURL
-          }
-        }
-      } catch (error) {
-        console.error('Error checking user login:', error)
-      }
-    }
-
-    const checkScreenSize = () => {
-      isMobile.value = window.innerWidth <= 768
-    }
-
-    const handleClickOutside = (event) => {
-      if (profileDropdown.value && !profileDropdown.value.contains(event.target)) {
-        dropdownOpen.value = false
-      }
-    }
-
-    const logout = () => {
-      localStorage.removeItem('user')
-      username.value = null
-      profileImage.value = defaultUserImage
-      router.push('/login')
-    }
-
-    onMounted(() => {
-      checkUserLogin()
-      checkScreenSize()
-      window.addEventListener('resize', checkScreenSize)
-      document.addEventListener('click', handleClickOutside)
-    })
-
-    onBeforeUnmount(() => {
-      window.removeEventListener('resize', checkScreenSize)
-      document.removeEventListener('click', handleClickOutside)
-    })
-
+  data() {
     return {
-      dropdownOpen,
-      username,
-      profileImage,
-      isMobile,
-      profileDropdown,
-      navigateTo,
-      toggleDropdown,
-      logout
+      dropdownOpen: false,
+      username: null,
+      profileImage: null
+    };
+  },
+
+  created() {
+    this.initializeAuth();
+    document.addEventListener('click', this.handleClickOutside);
+    
+    // Default rasmni o'rnatish
+    this.profileImage = defaultUserImage;
+  },
+
+  beforeUnmount() {
+    document.removeEventListener('click', this.handleClickOutside);
+  },
+
+  methods: {
+    initializeAuth() {
+      const auth = getAuth();
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          this.handleUserAuthenticated(user);
+        } else {
+          this.handleUserNotAuthenticated();
+        }
+      });
+    },
+
+    handleUserAuthenticated(user) {
+      this.username = user.displayName || user.email || 'User';
+      
+      // Faqat Google profil rasmi mavjud bo'lsagina uni ko'rsatish
+      if (user.photoURL) {
+        this.profileImage = user.photoURL;
+      } else {
+        this.profileImage = defaultUserImage;
+      }
+      
+      const userData = {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL
+      };
+      localStorage.setItem('user', JSON.stringify(userData));
+    },
+
+    handleUserNotAuthenticated() {
+      this.username = null;
+      this.profileImage = defaultUserImage;
+      localStorage.removeItem('user');
+    },
+
+    navigateTo(path) {
+      this.$router.push(path);
+    },
+
+    toggleDropdown() {
+      this.dropdownOpen = !this.dropdownOpen;
+    },
+
+    handleClickOutside(event) {
+      const profileElement = this.$el.querySelector('.profile');
+      if (profileElement && !profileElement.contains(event.target)) {
+        this.dropdownOpen = false;
+      }
+    },
+
+    async logout() {
+      try {
+        const auth = getAuth();
+        await signOut(auth);
+        this.dropdownOpen = false;
+        this.handleUserNotAuthenticated();
+        this.$router.push('/login');
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
     }
   }
-}
+};
 </script>
-
 
 <style scoped>
 * {
@@ -161,18 +150,6 @@ export default {
   cursor: pointer;
 }
 
-.profile-container {
-  display: flex;
-  align-items: center;
-}
-
-.username-display {
-  margin-right: 15px;
-  font-weight: 500;
-  font-size: 16px;
-  color: white;
-}
-
 .profile {
   position: relative;
 }
@@ -195,49 +172,62 @@ export default {
   position: absolute;
   top: 50px;
   right: 0;
-  min-width: 200px;
+  min-width: 220px;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   z-index: 1000;
-  padding: 15px 20px;
+  overflow: hidden;
+}
+
+.user-info {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-profile-image {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
 }
 
 .dropdown-username {
-  padding: 5px 0 15px;
-  margin-bottom: 10px;
   font-weight: 600;
   color: #333;
   font-size: 16px;
-  border-bottom: 1px solid #eee;
-  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-links {
+  padding: 10px 0;
 }
 
 .dropdown-content a {
-  margin-bottom: 10px;
-  text-align: left;
+  display: block;
+  padding: 10px 15px;
   color: #333;
   text-decoration: none;
   font-size: 16px;
   font-weight: 500;
-  transition: color 0.3s ease, transform 0.3s ease;
-  display: block;
-  width: 100%;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .dropdown-content a:hover {
+  background-color: #f8f9fa;
   color: #007bff;
-  transform: translateX(5px);
 }
 
 .custom-hr {
   border: none;
   border-top: 1px solid #ddd;
-  margin: 10px 0;
-  width: 100%;
+  margin: 5px 0;
 }
 
 .custom-hr::after {
@@ -267,7 +257,11 @@ export default {
 
   .dropdown-content {
     right: 0;
-    min-width: 180px;
+    min-width: 200px;
+  }
+  
+  .dropdown-username {
+    font-size: 14px;
   }
 }
 
@@ -290,17 +284,21 @@ export default {
 
   .dropdown-content {
     right: -10px;
-    min-width: 160px;
+    min-width: 180px;
   }
 
   .dropdown-content a {
     font-size: 14px;
-    margin-bottom: 8px;
+    padding: 8px 12px;
   }
   
-  .dropdown-username {
-    font-size: 14px;
-    padding-bottom: 10px;
+  .user-info {
+    padding: 10px;
+  }
+  
+  .dropdown-profile-image {
+    width: 30px;
+    height: 30px;
   }
 }
 
@@ -322,20 +320,22 @@ export default {
 
   .dropdown-content {
     right: -15px;
-    min-width: 140px;
-    padding: 10px 15px;
+    min-width: 160px;
   }
 
   .dropdown-content a {
     font-size: 13px;
-    margin-bottom: 6px;
+    padding: 6px 10px;
+  }
+  
+  .dropdown-profile-image {
+    width: 24px;
+    height: 24px;
   }
   
   .dropdown-username {
     font-size: 13px;
-    padding-bottom: 8px;
   }
 }
 </style>
-
 
