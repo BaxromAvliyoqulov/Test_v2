@@ -49,6 +49,13 @@ a{
     transform: translateY(2px); 
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); 
 }
+.gradient-text {
+    background: linear-gradient(145deg, #0056b3, #007bff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
 
 @media (max-width: 768px) {
     button {

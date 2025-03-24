@@ -13,12 +13,12 @@
       <div v-if="dropdownOpen" class="dropdown-content">
         <div class="user-info" v-if="username">
           <img :src="profileImage" class="dropdown-profile-image" alt="User Avatar">
-          <span class="dropdown-username">{{ username }}</span>
+          <router-link to="/dashboard" class="dropdown-username">{{ username }}</router-link>
         </div>
         <div class="dropdown-links">
           <router-link to="/points">Points</router-link>
           <router-link to="/about">About Us</router-link>
-          <router-link to="/contact-us">Contact Us</router-link>
+          <router-link to="/contactUs">Contact Us</router-link>
           <router-link to="/dashboard">Dashboard</router-link>
           <hr class="custom-hr">
           <router-link to="/login" @click="logout">Log Out</router-link>
@@ -30,7 +30,6 @@
 
 <script>
 import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
-// O'zingizning user.png rasmingizni import qiling
 import defaultUserImage from '../assets/img/user.png';
 
 export default {
@@ -69,7 +68,6 @@ export default {
     handleUserAuthenticated(user) {
       this.username = user.displayName || user.email || 'User';
       
-      // Faqat Google profil rasmi mavjud bo'lsagina uni ko'rsatish
       if (user.photoURL) {
         this.profileImage = user.photoURL;
       } else {
@@ -131,10 +129,10 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0 30px;
-  max-width: 1140px;
+  max-width: 1200px;
   width: 90%;
   height: 70px;
-  margin: 15px auto 20px;
+  margin: 15px auto;
   background: linear-gradient(145deg, #0056b3, #007bff); 
   color: white;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.1); 
@@ -203,6 +201,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .dropdown-links {
@@ -244,6 +243,7 @@ export default {
     padding: 0 15px;
     height: 60px;
     width: 95%;
+    margin: 0 auto;
   }
 
   .navbar h1 {
