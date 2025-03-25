@@ -1,91 +1,56 @@
 <template>
   <div class="container">
-    <h2 class="title">Add New Subject</h2>
-
-    <form @submit.prevent="addFan" class="form">
-      <div class="form-group">
-        <label>Select Subject</label>
-        <select v-model="selectedSubject" @change="updateLevels">
-          <option disabled value="">Choose a subject</option>
-          <option v-for="subject in subjects" :key="subject" :value="subject">
-            {{ subject }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Select Level</label>
-        <select v-model="selectedLevel">
-          <option disabled value="">Choose a level</option>
-          <option v-for="level in levels" :key="level" :value="level">
-            {{ level }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Upload File</label>
-        <input type="file" @change="handleFileUpload" />
-      </div>
-
-      <button type="submit" class="btn" :disabled="loading">
-        <span v-if="!loading">Send</span>
-        <span v-else class="loader"></span>
-      </button>
-    </form>
-
-    <div v-if="status" :class="['status', status.type]" style="cursor: pointer;">
-      {{ status.message }}
+    <LoginModal :show="!authenticated" @authenticated="handleAuthentication" />
+    <div v-if="authenticated">
+      <h2 class="title">Admin Panel</h2>
+      <button @click="currentView = 'addSubject'">Add Subject</button>
+      <button @click="currentView = 'addAdmin'">Add Admin</button>
+      <button @click="currentView = 'addProduct'">Add Product</button>
+      <button @click="logout" class="logout-btn">Logout</button>
+      <!-- Komponentlarni shartli ko'rsatish -->
+      <AddSubjectComponent v-if="currentView === 'addSubject'" />
+      <AddAdminComponent v-if="currentView === 'addAdmin'" />
+      <AddProductComponent v-if="currentView === 'addProduct'" />
     </div>
   </div>
 </template>
 
 <script>
-import { db } from "../../config/firebase";
-import { collection, doc, setDoc, addDoc } from "firebase/firestore";
+import LoginModal from './loginModal.vue';
+import AddAdminComponent from './addAdmin.vue';
+import AddSubjectComponent from './addSubject.vue';
+import AddProductComponent from './addProduct.vue';
 
 export default {
+  components: {
+    LoginModal,
+    AddAdminComponent,
+    AddSubjectComponent,
+    AddProductComponent
+  },
   data() {
     return {
-      fanNomi: "",
-      fanID: "",
-      selectedSubject: "",
-      selectedLevel: "",
-      file: null,
-      loading: false,
-      status: null,
-      subjects: ["English", "Math", "Physics", "History"],
-      levels: []
+      currentView: null, // Joriy ko'rsatilayotgan komponent
+      authenticated: false
     };
   },
+  created() {
+    // Проверяем наличие токена при создании компонента
+    const authToken = localStorage.getItem('adminAuth');
+    if (authToken) {
+      this.authenticated = true;
+    }
+  },
   methods: {
-    updateLevels() {
-      if (this.selectedSubject === "English") {
-        this.levels = ["A1", "A2", "B1", "B2", "C1"];
+    handleAuthentication(status) {
+      this.authenticated = status;
+      if (status) {
+        // Сохраняем статус аутентификации в localStorage
+        localStorage.setItem('adminAuth', 'true');
       } else {
-        this.levels = ["Elementary", "Beginner", "Intermediate", "Advanced"];
-      }
-    },
-    handleFileUpload(event) {
-      this.file = event.target.files[0];
-    },
-    async addFan() {
-      this.loading = true;
-      this.status = null;
-      try {
-        const fanRef = doc(db, "subjects", this.fanID);
-        await setDoc(fanRef, { name: this.fanNomi, subject: this.selectedSubject, level: this.selectedLevel }, { merge: true });
-
-        if (this.selectedLevel) {
-          const levelRef = collection(fanRef, this.selectedLevel.toLowerCase());
-          await addDoc(levelRef, { topic: `${this.fanNomi} - Lesson 1`, duration: "45 min" });
-        }
-
-        this.status = { type: "success", message: "✅ Subject added successfully!" };
-      } catch (error) {
-        this.status = { type: "error", message: "❌ Error adding subject!" };
-      } finally {
-        this.loading = false;
+        // Удаляем данные при выходе
+        localStorage.removeItem('adminAuth');
+        this.$router.push('/');
       }
     }
   }
@@ -94,16 +59,18 @@ export default {
 
 <style scoped>
 .container {
-  max-width: 400px;
+  max-width: 600px;
   margin: auto;
   padding: 20px;
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
 }
 
 .title {
-  text-align: center;
+  font-size: 24px;
+  color: #333;
   margin-bottom: 20px;
 }
 
@@ -120,28 +87,26 @@ select {
 }
 
 .btn {
-  width: 100%;
-  padding: 10px 20px;
-  font-size: 18px;
-  font-weight: 700;
+  width: 80%;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
   background-color: #007BFF;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  margin-top: 10px;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .btn:hover {
   background-color: #0056b3;
-  transform: translateY(-5px);
-  box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn:active {
-  transform: translateY(2px);
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(1px);
 }
 
 .btn:disabled {
@@ -184,4 +149,27 @@ select {
   background: #f8d7da;
   color: #721c24;
 }
+
+/* Log out button */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #c82333;
+}
+
 </style>

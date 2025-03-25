@@ -4,19 +4,21 @@
       <h1 @click="navigateTo('/')">Test.me</h1>
     </div>
     <div class="profile">
-      <img 
-        :src="profileImage" 
-        @click="toggleDropdown" 
-        class="profile-image" 
-        alt="User Avatar"
-      >
+      <img :src="profileImage" @click="toggleDropdown" class="profile-image" alt="User Avatar">
       <div v-if="dropdownOpen" class="dropdown-content">
         <div class="user-info" v-if="username">
           <img :src="profileImage" class="dropdown-profile-image" alt="User Avatar">
           <router-link to="/dashboard" class="dropdown-username">{{ username }}</router-link>
         </div>
+        <router-link to="/shop">
+          Shop
+          <i class="fa-solid fa-cart-shopping"></i>
+        </router-link>
         <div class="dropdown-links">
-          <router-link to="/points">Points</router-link>
+          <router-link to="/points">
+            Points
+            <img src="../assets/img/tpCoin.png" alt="TP Coin" style="width: 16px; height: 16px; margin-right: 5px;">
+          </router-link>
           <router-link to="/about">About Us</router-link>
           <router-link to="/contactUs">Contact Us</router-link>
           <router-link to="/dashboard">Dashboard</router-link>
@@ -44,7 +46,7 @@ export default {
   created() {
     this.initializeAuth();
     document.addEventListener('click', this.handleClickOutside);
-    
+
     // Default rasmni o'rnatish
     this.profileImage = defaultUserImage;
   },
@@ -67,13 +69,13 @@ export default {
 
     handleUserAuthenticated(user) {
       this.username = user.displayName || user.email || 'User';
-      
+
       if (user.photoURL) {
         this.profileImage = user.photoURL;
       } else {
         this.profileImage = defaultUserImage;
       }
-      
+
       const userData = {
         uid: user.uid,
         email: user.email,
@@ -133,9 +135,9 @@ export default {
   width: 90%;
   height: 70px;
   margin: 15px auto;
-  background: linear-gradient(145deg, #0056b3, #007bff); 
+  background: linear-gradient(145deg, #0056b3, #007bff);
   color: white;
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.1); 
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
 
@@ -259,7 +261,7 @@ export default {
     right: 0;
     min-width: 200px;
   }
-  
+
   .dropdown-username {
     font-size: 14px;
   }
@@ -291,11 +293,11 @@ export default {
     font-size: 14px;
     padding: 8px 12px;
   }
-  
+
   .user-info {
     padding: 10px;
   }
-  
+
   .dropdown-profile-image {
     width: 30px;
     height: 30px;
@@ -327,15 +329,14 @@ export default {
     font-size: 13px;
     padding: 6px 10px;
   }
-  
+
   .dropdown-profile-image {
     width: 24px;
     height: 24px;
   }
-  
+
   .dropdown-username {
     font-size: 13px;
   }
 }
 </style>
-

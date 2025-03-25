@@ -8,7 +8,8 @@ const admin = () => import('@/views/admin/index.vue');
 const about = () => import('@/views/about.vue');
 const contactUs = () => import('@/views/contactUs.vue');
 const dashboard = () => import('@/views/dashboard.vue');
-
+const points = () => import('@/views/points.vue');
+const shop = () => import('@/views/shop/shop.vue');
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -52,7 +53,17 @@ const router = createRouter({
 			path: '/dashboard',
 			name: 'dashboard',
 			component: dashboard
-		}
+		},
+		{
+			path:'/points',
+			name:'points',	
+			component: points
+		},
+		{
+			path:'/shop',
+			name:'shop',		
+			component: shop
+		},
 	],
 });
 
