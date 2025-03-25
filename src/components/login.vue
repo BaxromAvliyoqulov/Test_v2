@@ -175,6 +175,7 @@ export default {
   text-align: center;
 }
 
+
 .link-button a {
   color: #333;
   text-decoration: none;
