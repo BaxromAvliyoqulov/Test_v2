@@ -46,8 +46,19 @@ export default {
   methods: {
     // --- fanlarni olish
     async fetchFanlar() {
-      const querySnapshot = await getDocs(collection(db, "fanlar"));
-      console.log(querySnapshot);
+      try {
+        const querySnapshot = await getDocs(collection(db, "fanlar"));
+
+        const fanlar = [];
+        querySnapshot.forEach((doc) => {
+          fanlar.push({ id: doc.id, ...doc.data() }); // ID bilan qo‘shib olamiz
+        });
+
+        console.log("Barcha fanlar:", fanlar);
+      } catch (error) {
+        console.error("Xatolik:", error);
+      }
+
 
     },
     // darajalarni olish
