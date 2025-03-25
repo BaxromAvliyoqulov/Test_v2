@@ -1,28 +1,8 @@
 <template>
     <div class="container">
         <h2 class="title">Add New Subject</h2>
-        
+
         <form @submit.prevent="addFan" class="form">
-            <div class="form-group">
-                <label>Subject Name</label>
-                <input 
-                    v-model="fanNomi" 
-                    type="text" 
-                    required 
-                    placeholder="Example: Chemistry"
-                />
-            </div>
-
-            <div class="form-group">
-                <label>Subject ID</label>
-                <input 
-                    v-model="fanID" 
-                    type="text" 
-                    required 
-                    placeholder="Example: chemistry"
-                />
-            </div>
-
             <div class="form-group">
                 <label>Select Subject</label>
                 <select v-model="selectedSubject" @change="updateLevels">
@@ -54,7 +34,7 @@
             </button>
         </form>
 
-        <div v-if="status" :class="['status', status.type]">
+        <div v-if="status" :class="['status', status.type]" style="cursor: pointer;">
             {{ status.message }}
         </div>
     </div>
@@ -95,7 +75,7 @@ export default {
             try {
                 const fanRef = doc(db, "subjects", this.fanID);
                 await setDoc(fanRef, { name: this.fanNomi, subject: this.selectedSubject, level: this.selectedLevel }, { merge: true });
-                
+
                 if (this.selectedLevel) {
                     const levelRef = collection(fanRef, this.selectedLevel.toLowerCase());
                     await addDoc(levelRef, { topic: `${this.fanNomi} - Lesson 1`, duration: "45 min" });
@@ -121,19 +101,24 @@ export default {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
 .title {
     text-align: center;
     margin-bottom: 20px;
 }
+
 .form-group {
     margin-bottom: 15px;
 }
-input, select {
+
+input,
+select {
     width: 100%;
     padding: 8px;
     border-radius: 5px;
     border: 1px solid #ddd;
 }
+
 .btn {
     width: 100%;
     padding: 10px;
@@ -143,9 +128,11 @@ input, select {
     border-radius: 5px;
     cursor: pointer;
 }
+
 .btn:disabled {
     background: #ccc;
 }
+
 .loader {
     display: inline-block;
     width: 15px;
@@ -155,16 +142,31 @@ input, select {
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
+
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
+
 .status {
     margin-top: 15px;
     padding: 10px;
     text-align: center;
     border-radius: 5px;
 }
-.status.success { background: #d4edda; color: #155724; }
-.status.error { background: #f8d7da; color: #721c24; }
+
+.status.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status.error {
+    background: #f8d7da;
+    color: #721c24;
+}
 </style>
