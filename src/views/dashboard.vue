@@ -34,7 +34,7 @@
                                 {{ sortOrder === 'asc' ? '↑' : '↓' }}
                             </span>
                         </th>
-                        <th>Действия</th>
+                        <th>Event</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,11 +46,8 @@
                         <td :class="getScoreClass(item.score)">{{ item.score }}%</td>
                         <td>{{ formatDate(item.timestamp) }}</td>
                         <td class="actions">
-                            <button @click="viewDetails(item)" class="action-btn view">
-                                Просмотр
-                            </button>
                             <button @click="deleteItem(item)" class="action-btn delete">
-                                Удалить
+                                Delete
                             </button>
                         </td>
                     </tr>
@@ -64,17 +61,17 @@
                 @click="currentPage--"
                 class="pagination-btn"
             >
-                Назад
+                Previous
             </button>
             <span class="page-info">
-                Страница {{ currentPage }} из {{ totalPages }}
+                Page {{ currentPage }} is {{ totalPages }}
             </span>
             <button 
                 :disabled="currentPage === totalPages" 
                 @click="currentPage++"
                 class="pagination-btn"
             >
-                Вперед
+                Next
             </button>
         </div>
     </div>
@@ -101,17 +98,25 @@ export default {
             ],
             items: [
                 {
+                    userName:"John Wick",
+                    subject:"English",
+                    testNumber:1,
+                    testLevel:"A1",
+                    score: 100,
+                    timestamp: 1696953600000,
+                },
+                {
                     userName: "John Doe",
                     subject: "Math",
-                    testNumber: 1,
+                    testNumber: 2,
                     testLevel: "Easy",
                     score: 85,
-                    timestamp: 1697040000000,
+                    timestamp: 1697050000000,
                 },
                 {
                     userName: "Jane Smith",
                     subject: "Science",
-                    testNumber: 2,
+                    testNumber: 3,
                     testLevel: "Medium",
                     score: 90,
                     timestamp: 1697126400000,
@@ -119,11 +124,43 @@ export default {
                 {
                     userName: "Alice Johnson",
                     subject: "History",
-                    testNumber: 3,
+                    testNumber: 4,
                     testLevel: "Hard",
                     score: 75,
                     timestamp: 1697212800000,
                 },
+                {
+                    userName: "Jack Sparrow",
+                    subject: "English",
+                    testNumber: 5,
+                    testLevel: "A2",
+                    score: 100, 
+                    timestamp: 1697136400000,
+                },
+                {
+                    userName: "Jackie Chan",
+                    subject: "Martial Arts",
+                    testNumber: 6,
+                    testLevel: "B1",
+                    score: 95,
+                    timestamp: 1697236400000,
+                },
+                {
+                    userName: "Bruce Lee",
+                    subject: "Philosophy",
+                    testNumber: 7,
+                    testLevel: "B2",
+                    score: 98,
+                    timestamp: 1697336400000,
+                },
+                {
+                    userName: "Albert Einstein",
+                    subject: "Physics",
+                    testNumber: 8,
+                    testLevel: "C1",
+                    score: 99,
+                    timestamp: 1697436400000,
+                }
             ],
         };
     },
@@ -206,9 +243,10 @@ export default {
 
 <style scoped>
 .dashboard-container {
-    padding: 2rem;
+    padding: 1rem;
     max-width: 1200px;
     margin: 0 auto;
+    height: 100%;
 }
 
 .table-header {
