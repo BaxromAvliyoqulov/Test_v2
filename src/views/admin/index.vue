@@ -29,7 +29,7 @@
             </div>
 
             <button type="submit" class="btn" :disabled="loading">
-                <span v-if="!loading">Add Subject</span>
+                <span v-if="!loading">Send</span>
                 <span v-else class="loader"></span>
             </button>
         </form>
@@ -121,12 +121,27 @@ select {
 
 .btn {
     width: 100%;
-    padding: 10px;
-    background: #007bff;
-    color: #fff;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: 700;
+    background-color: #007BFF;
+    color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
+    transition: background-color 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-5px); 
+    box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.3); 
+}
+
+.btn:active {
+    transform: translateY(2px); 
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); 
 }
 
 .btn:disabled {
