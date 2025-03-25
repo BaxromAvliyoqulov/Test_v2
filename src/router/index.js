@@ -7,6 +7,7 @@ const testPage = () => import("@/views/testPage.vue");
 const admin = () => import('@/views/admin/index.vue');
 const about = () => import('@/views/about.vue');
 const contactUs = () => import('@/views/contactUs.vue');
+const dashboard = () => import('@/views/dashboard.vue');
 
 
 const router = createRouter({
@@ -46,6 +47,11 @@ const router = createRouter({
 			path: '/contactUs',
 			name: 'contactUs',
 			component: contactUs
+		},
+		{
+			path: '/dashboard',
+			name: 'dashboard',
+			component: dashboard
 		}
 	],
 });
