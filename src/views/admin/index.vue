@@ -25,7 +25,7 @@
 
       <div class="form-group">
         <label>Upload File</label>
-        <input type="file" @change="handleFileUpload" />
+        <input type="file" @change="handleFileUpload" accept="application/json" />
       </div>
 
       <button type="submit" class="btn" :disabled="loading">
@@ -47,11 +47,9 @@ import { collection, doc, setDoc, addDoc } from "firebase/firestore";
 export default {
   data() {
     return {
-      fanNomi: "",
-      fanID: "",
       selectedSubject: "",
       selectedLevel: "",
-      file: null,
+      tests: [],
       loading: false,
       status: null,
       subjects: ["English", "Math", "Physics", "History"],
@@ -69,25 +67,58 @@ export default {
     handleFileUpload(event) {
       this.file = event.target.files[0];
     },
+    // 
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsedData = JSON.parse(e.target.result);
+          // JSON strukturasi to‘g‘ri ekanligini tekshirish
+          if (!Array.isArray(parsedData)) throw new Error("JSON massiv bo‘lishi kerak!");
+          if (!parsedData.every((item) => item.question && item.options && item.answer)) {
+            throw new Error("Har bir test obyektida 'question', 'options', va 'answer' bo‘lishi kerak!");
+          }
+          this.testlar = parsedData;
+          this.uploadMessage = "✅ JSON fayl muvaffaqiyatli yuklandi!";
+        } catch (error) {
+          console.error("❌ JSON faylni o‘qishda xatolik:", error);
+          this.uploadMessage = "❌ Xatolik: Noto‘g‘ri JSON fayl!";
+        }
+      };
+      reader.readAsText(file);
+    },
+    // 
     async addFan() {
       this.loading = true;
       this.status = null;
-      try {
-        const fanRef = doc(db, "subjects", this.fanID);
-        await setDoc(fanRef, { name: this.fanNomi, subject: this.selectedSubject, level: this.selectedLevel }, { merge: true });
+      console.log(this.selectedLevel, this.selectedSubject);
 
-        if (this.selectedLevel) {
-          const levelRef = collection(fanRef, this.selectedLevel.toLowerCase());
-          await addDoc(levelRef, { topic: `${this.fanNomi} - Lesson 1`, duration: "45 min" });
+      try {
+        const fanRef = doc(db, "subjects", this.selectedSubject);
+        await setDoc(fanRef, {}, { merge: true });
+
+        const levelCollectionRef = collection(fanRef, this.selectedLevel);
+        
+        for (const test of this.testlar) {
+          await addDoc(levelCollectionRef, {
+            question: test.question,
+            options: test.options,
+            answer: test.answer,
+          });
         }
 
-        this.status = { type: "success", message: "✅ Subject added successfully!" };
+        this.status = { type: "success", message: "✅ Subject and tests added successfully!" };
       } catch (error) {
+        console.error("❌ Error adding subject:", error);
         this.status = { type: "error", message: "❌ Error adding subject!" };
       } finally {
         this.loading = false;
       }
     }
+
   }
 };
 </script>
