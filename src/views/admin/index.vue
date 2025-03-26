@@ -1,5 +1,18 @@
 <template>
   <div class="container">
+<<<<<<< HEAD
+    <LoginModal :show="!authenticated" @authenticated="handleAuthentication" />
+    <div v-if="authenticated">
+      <h2 class="title">Admin Panel</h2>
+      <button @click="currentView = 'addSubject'">Add Subject</button>
+      <button @click="currentView = 'addAdmin'">Add Admin</button>
+      <button @click="currentView = 'addProduct'">Add Product</button>
+      <button @click="logout" class="logout-btn">Logout</button>
+      <!-- Komponentlarni shartli ko'rsatish -->
+      <AddSubjectComponent v-if="currentView === 'addSubject'" />
+      <AddAdminComponent v-if="currentView === 'addAdmin'" />
+      <AddProductComponent v-if="currentView === 'addProduct'" />
+=======
     <h2 class="title">Add New Subject</h2>
 
     <form @submit.prevent="addFan" class="form">
@@ -36,17 +49,30 @@
 
     <div v-if="status" :class="['status', status.type]" style="cursor: pointer;">
       {{ status.message }}
+>>>>>>> 02c612bfef149344e216c0a03ee17b9d34f2c8bb
     </div>
   </div>
 </template>
 
 <script>
-import { db } from "../../config/firebase";
-import { collection, doc, setDoc, addDoc } from "firebase/firestore";
+import LoginModal from './loginModal.vue';
+import AddAdminComponent from './addAdmin.vue';
+import AddSubjectComponent from './addSubject.vue';
+import AddProductComponent from './addProduct.vue';
 
 export default {
+  components: {
+    LoginModal,
+    AddAdminComponent,
+    AddSubjectComponent,
+    AddProductComponent
+  },
   data() {
     return {
+<<<<<<< HEAD
+      currentView: null, // Joriy ko'rsatilayotgan komponent
+      authenticated: false
+=======
       selectedSubject: "",
       selectedLevel: "",
       tests: [],
@@ -54,13 +80,28 @@ export default {
       status: null,
       subjects: ["English", "Math", "Physics", "History"],
       levels: []
+>>>>>>> 02c612bfef149344e216c0a03ee17b9d34f2c8bb
     };
   },
+  created() {
+    // Проверяем наличие токена при создании компонента
+    const authToken = localStorage.getItem('adminAuth');
+    if (authToken) {
+      this.authenticated = true;
+    }
+  },
   methods: {
-    updateLevels() {
-      if (this.selectedSubject === "English") {
-        this.levels = ["A1", "A2", "B1", "B2", "C1"];
+    handleAuthentication(status) {
+      this.authenticated = status;
+      if (status) {
+        // Сохраняем статус аутентификации в localStorage
+        localStorage.setItem('adminAuth', 'true');
       } else {
+<<<<<<< HEAD
+        // Удаляем данные при выходе
+        localStorage.removeItem('adminAuth');
+        this.$router.push('/');
+=======
         this.levels = ["Elementary", "Beginner", "Intermediate", "Advanced"];
       }
     },
@@ -116,6 +157,7 @@ export default {
         this.status = { type: "error", message: "❌ Error adding subject!" };
       } finally {
         this.loading = false;
+>>>>>>> 02c612bfef149344e216c0a03ee17b9d34f2c8bb
       }
     }
 
@@ -125,16 +167,18 @@ export default {
 
 <style scoped>
 .container {
-  max-width: 400px;
+  max-width: 600px;
   margin: auto;
   padding: 20px;
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
 }
 
 .title {
-  text-align: center;
+  font-size: 24px;
+  color: #333;
   margin-bottom: 20px;
 }
 
@@ -151,28 +195,26 @@ select {
 }
 
 .btn {
-  width: 100%;
-  padding: 10px 20px;
-  font-size: 18px;
-  font-weight: 700;
+  width: 80%;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
   background-color: #007BFF;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  margin-top: 10px;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .btn:hover {
   background-color: #0056b3;
-  transform: translateY(-5px);
-  box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn:active {
-  transform: translateY(2px);
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(1px);
 }
 
 .btn:disabled {
@@ -215,4 +257,27 @@ select {
   background: #f8d7da;
   color: #721c24;
 }
+
+/* Log out button */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #c82333;
+}
+
 </style>
