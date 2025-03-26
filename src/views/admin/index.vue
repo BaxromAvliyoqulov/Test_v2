@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-<<<<<<< HEAD
     <LoginModal :show="!authenticated" @authenticated="handleAuthentication" />
     <div v-if="authenticated">
       <h2 class="title">Admin Panel</h2>
@@ -12,44 +11,43 @@
       <AddSubjectComponent v-if="currentView === 'addSubject'" />
       <AddAdminComponent v-if="currentView === 'addAdmin'" />
       <AddProductComponent v-if="currentView === 'addProduct'" />
-=======
-    <h2 class="title">Add New Subject</h2>
+      <h2 class="title">Add New Subject</h2>
 
-    <form @submit.prevent="addFan" class="form">
-      <div class="form-group">
-        <label>Select Subject</label>
-        <select v-model="selectedSubject" @change="updateLevels">
-          <option disabled value="">Choose a subject</option>
-          <option v-for="subject in subjects" :key="subject" :value="subject">
-            {{ subject }}
-          </option>
-        </select>
+      <form @submit.prevent="addFan" class="form">
+        <div class="form-group">
+          <label>Select Subject</label>
+          <select v-model="selectedSubject" @change="updateLevels">
+            <option disabled value="">Choose a subject</option>
+            <option v-for="subject in subjects" :key="subject" :value="subject">
+              {{ subject }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Select Level</label>
+          <select v-model="selectedLevel">
+            <option disabled value="">Choose a level</option>
+            <option v-for="level in levels" :key="level" :value="level">
+              {{ level }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Upload File</label>
+          <input type="file" @change="handleFileUpload" accept="application/json" />
+        </div>
+
+        <button type="submit" class="btn" :disabled="loading">
+          <span v-if="!loading">Send</span>
+          <span v-else class="loader"></span>
+        </button>
+      </form>
+
+      <div v-if="status" :class="['status', status.type]" style="cursor: pointer;">
+        {{ status.message }}
       </div>
-
-      <div class="form-group">
-        <label>Select Level</label>
-        <select v-model="selectedLevel">
-          <option disabled value="">Choose a level</option>
-          <option v-for="level in levels" :key="level" :value="level">
-            {{ level }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Upload File</label>
-        <input type="file" @change="handleFileUpload" accept="application/json" />
-      </div>
-
-      <button type="submit" class="btn" :disabled="loading">
-        <span v-if="!loading">Send</span>
-        <span v-else class="loader"></span>
-      </button>
-    </form>
-
-    <div v-if="status" :class="['status', status.type]" style="cursor: pointer;">
-      {{ status.message }}
->>>>>>> 02c612bfef149344e216c0a03ee17b9d34f2c8bb
     </div>
   </div>
 </template>
@@ -69,10 +67,8 @@ export default {
   },
   data() {
     return {
-<<<<<<< HEAD
       currentView: null, // Joriy ko'rsatilayotgan komponent
-      authenticated: false
-=======
+      authenticated: false,
       selectedSubject: "",
       selectedLevel: "",
       tests: [],
@@ -80,7 +76,6 @@ export default {
       status: null,
       subjects: ["English", "Math", "Physics", "History"],
       levels: []
->>>>>>> 02c612bfef149344e216c0a03ee17b9d34f2c8bb
     };
   },
   created() {
@@ -97,11 +92,10 @@ export default {
         // Сохраняем статус аутентификации в localStorage
         localStorage.setItem('adminAuth', 'true');
       } else {
-<<<<<<< HEAD
+
         // Удаляем данные при выходе
         localStorage.removeItem('adminAuth');
         this.$router.push('/');
-=======
         this.levels = ["Elementary", "Beginner", "Intermediate", "Advanced"];
       }
     },
@@ -142,7 +136,7 @@ export default {
         await setDoc(fanRef, {}, { merge: true });
 
         const levelCollectionRef = collection(fanRef, this.selectedLevel);
-        
+
         for (const test of this.testlar) {
           await addDoc(levelCollectionRef, {
             question: test.question,
@@ -157,7 +151,6 @@ export default {
         this.status = { type: "error", message: "❌ Error adding subject!" };
       } finally {
         this.loading = false;
->>>>>>> 02c612bfef149344e216c0a03ee17b9d34f2c8bb
       }
     }
 
@@ -279,5 +272,4 @@ select {
 .logout-btn:hover {
   background-color: #c82333;
 }
-
 </style>
