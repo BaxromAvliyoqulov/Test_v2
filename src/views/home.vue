@@ -6,7 +6,7 @@
     <div class="selectionSubject">
       <select v-model="selectedFan" name="" id="">
         <option selected disabled> Fanlarni Tanlang</option>
-        <option :value="item" v-for="(item, idx) in Fanlar"> {{ item }}</option>
+        <option :value="item" v-for="(item, idx) in Fanlar"> {{ item.id }}</option>
       </select>
     </div>
     <!-- number -->
@@ -47,13 +47,12 @@ export default {
     // --- fanlarni olish
     async fetchFanlar() {
       try {
-        const querySnapshot = await getDocs(collection(db, "fanlar"));
-
+        const querySnapshot = await getDocs(collection(db, "subjects"));
         const fanlar = [];
         querySnapshot.forEach((doc) => {
           fanlar.push({ id: doc.id, ...doc.data() }); // ID bilan qo‘shib olamiz
         });
-
+        this.Fanlar = fanlar
         console.log("Barcha fanlar:", fanlar);
       } catch (error) {
         console.error("Xatolik:", error);
