@@ -4,7 +4,7 @@
   <div class="selections">
     <!-- subject -->
     <div class="selectionSubject">
-      <select v-model="selectedFan" name="" id="">
+      <select v-model="selectedFan" @change="getTest">
         <option selected disabled> Fanlarni Tanlang</option>
         <option :value="item" v-for="(item, idx) in Fanlar"> {{ item.id }}</option>
       </select>
@@ -32,7 +32,7 @@
 
 <script>
 import { db } from '../config/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, doc, getDocs } from 'firebase/firestore';
 export default {
   data() {
     return {
@@ -50,25 +50,36 @@ export default {
         const querySnapshot = await getDocs(collection(db, "subjects"));
         const fanlar = [];
         querySnapshot.forEach((doc) => {
-          fanlar.push({ id: doc.id, ...doc.data() }); // ID bilan qo‘shib olamiz
+          fanlar.push({ id: doc.id, ...doc.data() });
         });
         this.Fanlar = fanlar
         console.log("Barcha fanlar:", fanlar);
       } catch (error) {
         console.error("Xatolik:", error);
       }
-
-
     },
-    // darajalarni olish
-    // async fetchDarajalar() {
-    //   if (!this.selectedFan) return;
-    //   const fanDocRef = collection(db, "fanlar", this.selectedFan);
-    //   const darajaSnapshot = await getDocs(fanDocRef)
-    //   console.log(darajaSnapshot);
-    //   this.darajalar = darajaSnapshot.docs.map((doc) => doc.id)
-    //   this.selectedDaraja = ""
-    // }
+    // tanlangan fanlarga  qarab  darajalarni  chiqarish
+    async getTest() {
+      try {
+        if (!this.selectedFan) return;
+        this.darajalar = []
+        const fanReff = this.selectedFan.id
+
+        const docRef = doc(db, 'subjects', fanReff)
+        const collections = await getDocs(docRef)
+
+        console.log((collections));
+
+        // if (docSnap.extends()) {
+        //   const collections = await getDocs(collection(db, 'subjects', fanReff))
+        //   this.darajalar = collections.docs.map(col => col.id)
+        // }
+      } catch (error) {
+        console.log(error);
+
+      }
+
+    }
   },
   mounted() {
     this.fetchFanlar()
