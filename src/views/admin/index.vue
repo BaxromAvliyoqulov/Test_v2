@@ -6,7 +6,10 @@
       <button class="button" @click="currentView = 'addSubject'">Add Subject</button>
       <button class="button" @click="currentView = 'addAdmin'">Add Admin</button>
       <button class="button" @click="currentView = 'addProduct'">Add Product</button>
-      <button class="button" @click="logout">Logout</button>
+      <button class="button" @click="logout">
+      <i class="fas fa-sign-out-alt"></i>
+      Logout
+      </button>
       <!-- Komponentlarni shartli ko'rsatish -->
       <AddSubjectComponent v-if="currentView === 'addSubject'" />
       <AddAdminComponent v-if="currentView === 'addAdmin'" />
@@ -61,7 +64,7 @@ export default {
     logout() {
       localStorage.removeItem('adminAuth');
       this.authenticated = false;
-      this.$router.push('/login');
+      this.$router.push('/');
     },
   }
 };
@@ -72,11 +75,11 @@ export default {
   max-width: 600px;
   margin: auto;
   padding: 20px;
+  padding-bottom: 40px;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   text-align: center;
-  padding: 50px 20px;
 }
 
 .title {

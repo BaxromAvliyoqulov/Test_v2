@@ -11,19 +11,32 @@
           <router-link to="/dashboard" class="dropdown-username">{{ username }}</router-link>
         </div>
         <router-link to="/shop">
-          Shop
           <i class="fa-solid fa-cart-shopping"></i>
+          Shop
         </router-link>
         <div class="dropdown-links">
           <router-link to="/points">
-            Points
+            
             <img src="../assets/img/tpCoin.png" alt="TP Coin" style="width: 16px; height: 16px; margin-right: 5px;">
+            Points
           </router-link>
-          <router-link to="/about">About Us</router-link>
-          <router-link to="/contactUs">Contact Us</router-link>
-          <router-link to="/dashboard">Dashboard</router-link>
-          <hr class="custom-hr">
-          <router-link to="/login" @click="logout">Log Out</router-link>
+          <router-link to="/about">
+      <i class="fas fa-info-circle"></i>
+      About Us
+    </router-link>
+    <router-link to="/contactUs">
+      <i class="fas fa-envelope"></i>
+      Contact Us
+    </router-link>
+    <router-link to="/dashboard">
+      <i class="fas fa-chart-line"></i>
+      Dashboard
+    </router-link>
+    <hr class="custom-hr">
+    <router-link to="/login" @click="logout">
+      <i class="fas fa-sign-out-alt"></i>
+      Log Out
+    </router-link>
         </div>
       </div>
     </div>

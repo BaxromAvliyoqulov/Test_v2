@@ -1,11 +1,23 @@
 <template>
-  <div class="shop-container">
-    <h1>Do'kon</h1>
-    <ul class="product-list">
-      <Card v-for="item in items" :key="item.id" :item="item" :addToCart="addToCart" />
-    </ul>
-    <Basket :cart="cart" />
-  </div>
+    <div class="shop-container">
+        <h1>Do'kon</h1>
+        <div class="shop-content">
+            <div class="product-grid">
+                <Card 
+                    v-for="item in items" 
+                    :key="item.id" 
+                    :item="item"
+                    @add-to-cart="addToCart"
+                />
+            </div>
+            <Basket 
+                :cart="cart"
+                @update-quantity="updateQuantity"
+                @remove-item="removeFromCart"
+                @checkout="checkout"
+            />
+        </div>
+    </div>
 </template>
 
 <script>
@@ -13,48 +25,122 @@ import Card from './card.vue';
 import Basket from './Basket.vue';
 
 export default {
-  components: {
-    Card,
-    Basket
-  },
-  data() {
-    return {
-      items: [
-        { id: 1, name: 'Mahsulot 1', description: 'Mahsulot tavsifi', price: 100 },
-        // Boshqa mahsulotlar
-      ],
-      cart: []
-    };
-  },
-  filters: {
-    toTPCoins(value) {
-      // Bu yerda valyuta konvertatsiyasi bo'ladi
-      return value;
+    name: 'Shop',
+    components: {
+        Card,
+        Basket
+    },
+    data() {
+        return {
+            items: [
+                {
+                    id: 1,
+                    name: 'Premium Test To\'plami',
+                    description: 'Barcha fanlardan maxsus testlar',
+                    price: 1500,
+                    image: require('./shopImg/Product1.webp'),
+                    tag: 'Premium'
+                },
+                {
+                    id: 2,
+                    name: 'Video Darslar',
+                    description: 'Professional o\'qituvchilardan video darslar',
+                    price: 2000,
+                    image: require('./shopImg/product2.webp'),
+                    tag: 'NEW'
+                },
+                {
+                    id: 3,
+                    name: 'Study Materials',
+                    description: 'O\'quv qo\'llanmalar to\'plami',
+                    price: 1000,
+                    image: require('./shopImg/Product3.jpeg')
+                }
+            ],
+            cart: []
+        };
+    },
+    methods: {
+        addToCart(item) {
+            const existingItem = this.cart.find(i => i.id === item.id);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                this.cart.push({ ...item, quantity: 1 });
+            }
+        },
+        updateQuantity({ item, change }) {
+            const cartItem = this.cart.find(i => i.id === item.id);
+            if (cartItem) {
+                const newQuantity = cartItem.quantity + change;
+                if (newQuantity > 0) {
+                    cartItem.quantity = newQuantity;
+                } else {
+                    this.removeFromCart(item);
+                }
+            }
+        },
+        removeFromCart(item) {
+            const index = this.cart.findIndex(i => i.id === item.id);
+            if (index > -1) {
+                this.cart.splice(index, 1);
+            }
+        },
+        checkout() {
+            // Здесь будет логика оформления заказа
+            console.log('Оформление заказа:', this.cart);
+            // Можно добавить переход на страницу оформления заказа
+            // this.$router.push('/checkout');
+        }
     }
-  },
-  methods: {
-    addToCart(item) {
-      const existingItem = this.cart.find(cartItem => cartItem.id === item.id);
-      if (existingItem) {
-        existingItem.quantity++;
-      } else {
-        this.cart.push({ ...item, quantity: 1 });
-      }
-    }
-  }
-}
+};
 </script>
 
 <style scoped>
 .shop-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
 }
 
-.product-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+}
+
+.shop-content {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .shop-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .shop-container {
+        padding: 1rem;
+    }
+    
+    .product-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
 }
 </style>

@@ -10,6 +10,7 @@ const contactUs = () => import('@/views/contactUs.vue');
 const dashboard = () => import('@/views/dashboard.vue');
 const points = () => import('@/views/points.vue');
 const shop = () => import('@/views/shop/shop.vue');
+const NotFound = () => import('@/views/404.vue');
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -60,10 +61,15 @@ const router = createRouter({
 			component: points
 		},
 		{
-			path:'/shop',
-			name:'shop',		
+			path: '/shop',
+			name: 'shop',
 			component: shop
 		},
+		{
+			path: '/404',
+			name: 'NotFound',
+			component: NotFound
+		}
 	],
 });
 
