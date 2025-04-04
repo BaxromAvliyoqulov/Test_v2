@@ -32,7 +32,7 @@ export default {
 }
 
 .not-found a {
-    color: #007bff; /* Основной цвет из навбара */
+    color: #007bff;
     text-decoration: none;
     font-weight: 600;
     padding: 0.5rem 1rem;

@@ -1,38 +1,84 @@
 <template>
+  <div class="test-selection">
+    <h1>Testni Tanlang</h1>
+    <div class="selections">
+      <!-- Fan tanlash -->
+      <div class="selection-group">
+        <label for="subject">Fan</label>
+        <select 
+          id="subject"
+          v-model="selectedFan" 
+          @change="getTest"
+          :class="{ 'error': submitted && !selectedFan }"
+        >
+          <option value="" disabled>Fanlarni Tanlang</option>
+          <option 
+            v-for="fan in Fanlar" 
+            :key="fan.id" 
+            :value="fan"
+          >
+            {{ fan.id }}
+          </option>
+        </select>
+      </div>
 
-  <h1>Select Your Subject</h1>
-  <div class="selections">
-    <!-- subject -->
-    <div class="selectionSubject">
-      <select v-model="selectedFan" @change="getTest">
-        <option selected disabled> Fanlarni Tanlang</option>
-        <option :value="item" v-for="(item, idx) in Fanlar"> {{ item.id }}</option>
-      </select>
+      <!-- Test soni -->
+      <div class="selection-group">
+        <label for="quantity">Test Soni</label>
+        <select 
+          id="quantity"
+          v-model="selectedQuantity"
+          :class="{ 'error': submitted && !selectedQuantity }"
+        >
+          <option value="" disabled>Test sonini tanlang</option>
+          <option 
+            v-for="number in TestNumber" 
+            :key="number" 
+            :value="number"
+          >
+            {{ number }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Daraja -->
+      <div class="selection-group">
+        <label for="level">Daraja</label>
+        <select 
+          id="level"
+          v-model="selectedDaraja"
+          :class="{ 'error': submitted && !selectedDaraja }"
+        >
+          <option value="" disabled>Darajangizni tanlang</option>
+          <option 
+            v-for="daraja in darajalar" 
+            :key="daraja" 
+            :value="daraja"
+          >
+            {{ daraja }}
+          </option>
+        </select>
+      </div>
     </div>
-    <!-- number -->
-    <div class="selectQuantity">
-      <select name="" id="">
-        <option selected disabled> test sonini tanlang</option>
-        <option value="5" v-for="item in TestNumber">{{ item }}</option>
-      </select>
+
+    <!-- Start Button -->
+    <div class="select-start">
+      <button 
+        class="start-button" 
+        @click="startTest"
+        :disabled="isLoading"
+      >
+        <span v-if="!isLoading">Testni Boshlash</span>
+        <span v-else class="loader"></span>
+      </button>
     </div>
-    <!-- degree -->
-    <div class="selectDegree">
-      <select name="" id="" v-model="selectedDaraja">
-        <option selected disabled> darajangizni tanlang</option>
-        <option value="A1" v-for="item in darajalar">{{ item }}</option>
-      </select>
-    </div>
-  </div>
-  <!-- Start Button -->
-  <div class="selectStart">
-    <button class="button" id="startTest" @click="$router.push({ name: 'testPage' })">Start Test</button>
   </div>
 </template>
 
 <script>
 import { db } from '../config/firebase';
 import { collection, doc, getDocs } from 'firebase/firestore';
+
 export default {
   data() {
     return {
@@ -41,122 +87,167 @@ export default {
       darajalar: [],
       selectedFan: "",
       selectedDaraja: "",
+      selectedQuantity: "",
+      isLoading: false,
+      submitted: false
     }
   },
   methods: {
-    // --- fanlarni olish
     async fetchFanlar() {
       try {
         const querySnapshot = await getDocs(collection(db, "subjects"));
-        const fanlar = [];
-        querySnapshot.forEach((doc) => {
-          fanlar.push({ id: doc.id, ...doc.data() });
-        });
-        this.Fanlar = fanlar
-        console.log("Barcha fanlar:", fanlar);
+        this.Fanlar = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
       } catch (error) {
         console.error("Xatolik:", error);
       }
     },
-    // tanlangan fanlarga  qarab  darajalarni  chiqarish
     async getTest() {
       try {
         if (!this.selectedFan) return;
-        this.darajalar = []
-        const fanReff = this.selectedFan.id
-
-        const docRef = doc(db, 'subjects', fanReff)
-        const collections = await getDocs(docRef)
-
-        console.log((collections));
-
-        // if (docSnap.extends()) {
-        //   const collections = await getDocs(collection(db, 'subjects', fanReff))
-        //   this.darajalar = collections.docs.map(col => col.id)
-        // }
+        
+        this.darajalar = [];
+        const fanRef = doc(db, 'subjects', this.selectedFan.id);
+        const collections = await getDocs(collection(fanRef, 'levels'));
+        this.darajalar = collections.docs.map(doc => doc.id);
       } catch (error) {
-        console.log(error);
+        console.error("Xatolik:", error);
+      }
+    },
+    startTest() {
+      this.submitted = true;
 
+      if (!this.selectedFan || !this.selectedQuantity || !this.selectedDaraja) {
+        return;
       }
 
+      this.isLoading = true;
+      
+      // Test ma'lumotlarini tayyorlash
+      // Bu yerda test ma'lumotlarini tayyorlash va saqlash jarayonini qo'shishingiz mumkin
+      const testData = {
+        fan: this.selectedFan.id,
+        testSoni: this.selectedQuantity,
+        daraja: this.selectedDaraja
+      };
+
+      // Test sahifasiga o'tish
+      this.$router.push({ 
+        name: 'testPage',
+        params: { testData: JSON.stringify(testData) }
+      });
     }
   },
   mounted() {
-    this.fetchFanlar()
+    this.fetchFanlar();
   }
 }
 </script>
-
 <style scoped>
+.test-selection {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
 h1 {
   text-align: center;
-  margin-top: 20px;
+  color: #2c3e50;
+  margin-bottom: 2rem;
 }
 
 .selections {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.selectionSubject,
-.selectQuantity,
-.selectDegree,
-.selectStart {
+.selection-group {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 0.5rem;
+}
+
+label {
+  font-weight: 600;
+  color: #2c3e50;
 }
 
 select {
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 200px;
-  max-width: 200px;
+  padding: 0.75rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
 }
 
-#startTest {
-  padding: 10px 20px;
-  font-size: 18px;
-  font-weight: 700;
-  background-color: #007BFF;
+select:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+select.error {
+  border-color: #dc3545;
+}
+
+.start-button {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: white;
+  background: linear-gradient(145deg, #0056b3, #007bff);
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  margin-top: 20px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-#startTest:hover {
-  background-color: #0056b3;
+.start-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
 }
 
-#startTest:active {
-  transform: translateY(2px);
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+.start-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.loader {
+  width: 20px;
+  height: 20px;
+  border: 3px solid white;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {
+  .test-selection {
+    padding: 1rem;
+  }
+
   .selections {
-    flex-direction: column;
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
   }
 
   select {
-    width: 200px;
-  }
-
-  button {
-    max-width: 100%;
+    width: 100%;
   }
 }
 </style>

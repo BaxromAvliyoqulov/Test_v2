@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { db } from "@/config/firebase";
+import { db } from "../../config/firebase";
 import { collection, doc, setDoc, addDoc } from "firebase/firestore";
 
 export default {
@@ -49,7 +49,7 @@ export default {
             selectedSubject: "",
             selectedLevel: "",
             subjects: ["English", "Math", "Physics", "History"],
-            levels: ["Elementary", "Beginner", "Intermediate", "Advanced"],
+            levels: [ "Beginner","Elementary", "Intermediate", "Advanced"],
             file: null,
             loading: false,
             status: null
@@ -58,6 +58,8 @@ export default {
     methods: {
         updateLevels() {
             // Logic to update levels based on selected subject
+            
+            
         },
         handleFileUpload(event) {
             this.file = event.target.files[0];
