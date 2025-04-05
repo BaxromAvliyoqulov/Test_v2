@@ -5,18 +5,14 @@
       <!-- Fan tanlash -->
       <div class="selection-group">
         <label for="subject">Fan</label>
-        <select 
+        <select
           id="subject"
-          v-model="selectedFan" 
+          v-model="selectedFan"
           @change="getTest"
-          :class="{ 'error': submitted && !selectedFan }"
+          :class="{ error: submitted && !selectedFan }"
         >
           <option value="" disabled>Fanlarni Tanlang</option>
-          <option 
-            v-for="fan in Fanlar" 
-            :key="fan.id" 
-            :value="fan"
-          >
+          <option v-for="fan in Fanlar" :key="fan.id" :value="fan">
             {{ fan.id }}
           </option>
         </select>
@@ -25,17 +21,13 @@
       <!-- Test soni -->
       <div class="selection-group">
         <label for="quantity">Test Soni</label>
-        <select 
+        <select
           id="quantity"
           v-model="selectedQuantity"
-          :class="{ 'error': submitted && !selectedQuantity }"
+          :class="{ error: submitted && !selectedQuantity }"
         >
           <option value="" disabled>Test sonini tanlang</option>
-          <option 
-            v-for="number in TestNumber" 
-            :key="number" 
-            :value="number"
-          >
+          <option v-for="number in TestNumber" :key="number" :value="number">
             {{ number }}
           </option>
         </select>
@@ -44,17 +36,13 @@
       <!-- Daraja -->
       <div class="selection-group">
         <label for="level">Daraja</label>
-        <select 
+        <select
           id="level"
           v-model="selectedDaraja"
-          :class="{ 'error': submitted && !selectedDaraja }"
+          :class="{ error: submitted && !selectedDaraja }"
         >
           <option value="" disabled>Darajangizni tanlang</option>
-          <option 
-            v-for="daraja in darajalar" 
-            :key="daraja" 
-            :value="daraja"
-          >
+          <option v-for="daraja in darajalar" :key="daraja" :value="daraja">
             {{ daraja }}
           </option>
         </select>
@@ -63,11 +51,7 @@
 
     <!-- Start Button -->
     <div class="select-start">
-      <button 
-        class="start-button" 
-        @click="startTest"
-        :disabled="isLoading"
-      >
+      <button class="start-button" @click="startTest" :disabled="isLoading">
         <span v-if="!isLoading">Testni Boshlash</span>
         <span v-else class="loader"></span>
       </button>
@@ -85,35 +69,35 @@ export default {
       Fanlar: [],
       TestNumber: ['5', '10', '15', '20', '25', '30', '35', '40', '45', '50'],
       darajalar: [],
-      selectedFan: "",
-      selectedDaraja: "",
-      selectedQuantity: "",
+      selectedFan: '',
+      selectedDaraja: '',
+      selectedQuantity: '',
       isLoading: false,
-      submitted: false
-    }
+      submitted: false,
+    };
   },
   methods: {
     async fetchFanlar() {
       try {
-        const querySnapshot = await getDocs(collection(db, "subjects"));
-        this.Fanlar = querySnapshot.docs.map(doc => ({
+        const querySnapshot = await getDocs(collection(db, 'subjects'));
+        this.Fanlar = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         }));
       } catch (error) {
-        console.error("Xatolik:", error);
+        console.error('Xatolik:', error);
       }
     },
     async getTest() {
       try {
         if (!this.selectedFan) return;
-        
+
         this.darajalar = [];
         const fanRef = doc(db, 'subjects', this.selectedFan.id);
         const collections = await getDocs(collection(fanRef, 'levels'));
-        this.darajalar = collections.docs.map(doc => doc.id);
+        this.darajalar = collections.docs.map((doc) => doc.id);
       } catch (error) {
-        console.error("Xatolik:", error);
+        console.error('Xatolik:', error);
       }
     },
     startTest() {
@@ -124,26 +108,26 @@ export default {
       }
 
       this.isLoading = true;
-      
+
       // Test ma'lumotlarini tayyorlash
       // Bu yerda test ma'lumotlarini tayyorlash va saqlash jarayonini qo'shishingiz mumkin
       const testData = {
         fan: this.selectedFan.id,
         testSoni: this.selectedQuantity,
-        daraja: this.selectedDaraja
+        daraja: this.selectedDaraja,
       };
 
       // Test sahifasiga o'tish
-      this.$router.push({ 
+      this.$router.push({
         name: 'testPage',
-        params: { testData: JSON.stringify(testData) }
+        params: { testData: JSON.stringify(testData) },
       });
-    }
+    },
   },
   mounted() {
     this.fetchFanlar();
-  }
-}
+  },
+};
 </script>
 <style scoped>
 .test-selection {
@@ -233,8 +217,12 @@ select.error {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {

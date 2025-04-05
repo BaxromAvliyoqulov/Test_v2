@@ -4,35 +4,49 @@
       <h1 @click="navigateTo('/')">Test.me</h1>
     </div>
     <div class="profile">
-      <img :src="profileImage" @click="toggleDropdown" class="profile-image" alt="User Avatar">
+      <img
+        :src="profileImage"
+        @click="toggleDropdown"
+        class="profile-image"
+        alt="User Avatar"
+      />
       <div v-if="dropdownOpen" class="dropdown-content">
         <div class="user-info" v-if="username">
-          <img :src="profileImage" class="dropdown-profile-image" alt="User Avatar">
-          <router-link to="/editProfile" class="dropdown-username">{{ username }}</router-link>
+          <img
+            :src="profileImage"
+            class="dropdown-profile-image"
+            alt="User Avatar"
+          />
+          <router-link to="/editProfile" class="dropdown-username">{{
+            username
+          }}</router-link>
         </div>
         <div class="dropdown-links">
           <router-link to="/points">
-            
-            <img src="../assets/img/tpCoin.png" alt="TP Coin" style="width: 16px; height: 16px; margin-right: 5px;">
+            <img
+              src="../assets/img/tpCoin.png"
+              alt="TP Coin"
+              style="width: 16px; height: 16px; margin-right: 5px"
+            />
             Points
           </router-link>
           <router-link to="/about">
-      <i class="fas fa-info-circle"></i>
-      About Us
-    </router-link>
-    <router-link to="/contactUs">
-      <i class="fas fa-envelope"></i>
-      Contact Us
-    </router-link>
-    <router-link to="/dashboard">
-      <i class="fas fa-chart-line"></i>
-      Dashboard
-    </router-link>
-    <hr class="custom-hr">
-    <router-link to="/login" @click="logout">
-      <i class="fas fa-sign-out-alt"></i>
-      Log Out
-    </router-link>
+            <i class="fas fa-info-circle"></i>
+            About Us
+          </router-link>
+          <router-link to="/contactUs">
+            <i class="fas fa-envelope"></i>
+            Contact Us
+          </router-link>
+          <router-link to="/dashboard">
+            <i class="fas fa-chart-line"></i>
+            Dashboard
+          </router-link>
+          <hr class="custom-hr" />
+          <router-link to="/login" @click="logout">
+            <i class="fas fa-sign-out-alt"></i>
+            Log Out
+          </router-link>
         </div>
       </div>
     </div>
@@ -40,28 +54,28 @@
 </template>
 
 <script>
-import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
-import defaultUserImage from '../assets/img/user.png';
+import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
+import defaultUserImage from "../assets/img/user.png";
 
 export default {
   data() {
     return {
       dropdownOpen: false,
       username: null,
-      profileImage: null
+      profileImage: null,
     };
   },
 
   created() {
     this.initializeAuth();
-    document.addEventListener('click', this.handleClickOutside);
+    document.addEventListener("click", this.handleClickOutside);
 
     // Default rasmni o'rnatish
     this.profileImage = defaultUserImage;
   },
 
   beforeUnmount() {
-    document.removeEventListener('click', this.handleClickOutside);
+    document.removeEventListener("click", this.handleClickOutside);
   },
 
   methods: {
@@ -77,7 +91,7 @@ export default {
     },
 
     handleUserAuthenticated(user) {
-      this.username = user.displayName || user.email || 'User';
+      this.username = user.displayName || user.email || "User";
 
       if (user.photoURL) {
         this.profileImage = user.photoURL;
@@ -89,15 +103,15 @@ export default {
         uid: user.uid,
         email: user.email,
         displayName: user.displayName,
-        photoURL: user.photoURL
+        photoURL: user.photoURL,
       };
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem("user", JSON.stringify(userData));
     },
 
     handleUserNotAuthenticated() {
       this.username = null;
       this.profileImage = defaultUserImage;
-      localStorage.removeItem('user');
+      localStorage.removeItem("user");
     },
 
     navigateTo(path) {
@@ -109,7 +123,7 @@ export default {
     },
 
     handleClickOutside(event) {
-      const profileElement = this.$el.querySelector('.profile');
+      const profileElement = this.$el.querySelector(".profile");
       if (profileElement && !profileElement.contains(event.target)) {
         this.dropdownOpen = false;
       }
@@ -121,12 +135,12 @@ export default {
         await signOut(auth);
         this.dropdownOpen = false;
         this.handleUserNotAuthenticated();
-        this.$router.push('/login');
+        this.$router.push("/login");
       } catch (error) {
         console.error("Logout error:", error);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -146,7 +160,9 @@ export default {
   margin: 15px auto;
   background: linear-gradient(145deg, #0056b3, #007bff);
   color: white;
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.1);
+  box-shadow:
+    4px 4px 10px rgba(0, 0, 0, 0.3),
+    -4px -4px 10px rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
 
@@ -169,7 +185,9 @@ export default {
   border-radius: 50%;
   object-fit: cover;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .profile-image:hover {
@@ -226,7 +244,9 @@ export default {
   text-decoration: none;
   font-size: 16px;
   font-weight: 500;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 .dropdown-content a:hover {
@@ -241,7 +261,7 @@ export default {
 }
 
 .custom-hr::after {
-  content: '';
+  content: "";
   display: block;
   height: 1px;
   background: linear-gradient(to right, #007bff, #0056b3);

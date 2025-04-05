@@ -3,9 +3,15 @@
     <LoginModal :show="!authenticated" @authenticated="handleAuthentication" />
     <div v-if="authenticated">
       <h2 class="title">Admin Panel</h2>
-      <button class="button" @click="currentView = 'addSubject'">Add Subject</button>
-      <button class="button" @click="currentView = 'addAdmin'">Add Admin</button>
-      <button class="button" @click="currentView = 'addProduct'">Add Product</button>
+      <button class="button" @click="currentView = 'addSubject'">
+        Add Subject
+      </button>
+      <button class="button" @click="currentView = 'addAdmin'">
+        Add Admin
+      </button>
+      <button class="button" @click="currentView = 'addProduct'">
+        Add Product
+      </button>
       <button class="button" @click="logout">
         <i class="fas fa-sign-out-alt"></i>
         Logout
@@ -19,17 +25,17 @@
 </template>
 
 <script>
-import LoginModal from './loginModal.vue';
-import AddAdminComponent from './addAdmin.vue';
-import AddSubjectComponent from './addSubject.vue';
-import AddProductComponent from './addProduct.vue';
+import LoginModal from "./loginModal.vue";
+import AddAdminComponent from "./addAdmin.vue";
+import AddSubjectComponent from "./addSubject.vue";
+import AddProductComponent from "./addProduct.vue";
 
 export default {
   components: {
     LoginModal,
     AddAdminComponent,
     AddSubjectComponent,
-    AddProductComponent
+    AddProductComponent,
   },
   data() {
     return {
@@ -41,12 +47,12 @@ export default {
       loading: false,
       status: null,
       subjects: ["English", "Math", "Physics", "History"],
-      levels: ["Beginner"]
+      levels: ["Beginner"],
     };
   },
   created() {
     // Checking token
-    const authToken = localStorage.getItem('adminAuth');
+    const authToken = localStorage.getItem("adminAuth");
     if (authToken) {
       this.authenticated = true;
     }
@@ -55,18 +61,18 @@ export default {
     handleAuthentication(status) {
       this.authenticated = status;
       if (!status) {
-        localStorage.removeItem('adminAuth');
-        this.$router.push('/');
+        localStorage.removeItem("adminAuth");
+        this.$router.push("/");
       } else {
-        localStorage.setItem('adminAuth', 'true');
+        localStorage.setItem("adminAuth", "true");
       }
     },
     logout() {
-      localStorage.removeItem('adminAuth');
+      localStorage.removeItem("adminAuth");
       this.authenticated = false;
-      this.$router.push('/');
+      this.$router.push("/");
     },
-  }
+  },
 };
 </script>
 

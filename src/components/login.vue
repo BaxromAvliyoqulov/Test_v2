@@ -5,12 +5,23 @@
       <form @submit.prevent="handleLogin">
         <div class="input-group">
           <label for="username">Username:</label>
-          <input type="text" id="username" v-model="form.username" required autofocus />
+          <input
+            type="text"
+            id="username"
+            v-model="form.username"
+            required
+            autofocus
+          />
         </div>
         <div class="input-group">
           <label for="password">Password:</label>
           <div class="password-input-wrapper">
-            <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" required />
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              id="password"
+              v-model="form.password"
+              required
+            />
             <span class="toggle-password" @click="togglePasswordVisibility">
               <i :class="showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
             </span>
@@ -24,7 +35,9 @@
           </button>
         </div>
         <div class="link-button">
-          <router-link to="/SignUp">Don't have an account? <span>Sign up</span></router-link>
+          <router-link to="/SignUp"
+            >Don't have an account? <span>Sign up</span></router-link
+          >
         </div>
       </form>
 
@@ -35,30 +48,34 @@
 </template>
 
 <script>
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { auth } from '../config/firebase'
-  import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { auth } from "../config/firebase";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 export default {
   setup() {
-    const router = useRouter()
-    const errorMessage = ref('')
-    const successMessage = ref('')
+    const router = useRouter();
+    const errorMessage = ref("");
+    const successMessage = ref("");
 
     return {
       errorMessage,
       successMessage,
-      router
-    }
+      router,
+    };
   },
   data() {
     return {
       form: {
-        username: '',
-        password: ''
+        username: "",
+        password: "",
       },
-      showPassword: false
+      showPassword: false,
     };
   },
   methods: {
@@ -70,13 +87,14 @@ export default {
         .then((userCredential) => {
           // Login muvaffaqiyatli
           const user = userCredential.user;
-          console.log('Login successful:', user);
+          console.log("Login successful:", user);
           // Redirect to the home page
-          this.router.push('/');
+          this.router.push("/");
         })
         .catch((error) => {
           // Xatolik yuz bersa, xato xabarini ko'rsatish
-          this.errorMessage = "Username or password is incorrect. Please try again.";
+          this.errorMessage =
+            "Username or password is incorrect. Please try again.";
           console.error("Login failed:", error.message);
         });
     },
@@ -96,14 +114,13 @@ export default {
         // Success xabarini ko'rsatish
         this.successMessage = "Google login successful!";
         // Home sahifasiga yo'naltirish
-        this.router.push('/');
-
+        this.router.push("/");
       } catch (error) {
         // Xatolik yuz bersa
         console.error("Google LogIn failed:", error.message);
         this.errorMessage = "Google login error. Please try again.";
       }
-    }
+    },
   },
 };
 </script>
@@ -154,7 +171,9 @@ export default {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
-  transition: border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  transition:
+    border 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
 }
 
 .input-group input:focus {
@@ -208,7 +227,9 @@ export default {
   border-radius: 4px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s, border-color 0.3s;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
 }
 
 .google-login button:hover {
@@ -253,11 +274,11 @@ export default {
   .login-box {
     padding: 20px;
   }
-  
+
   .input-group input {
     padding: 10px;
   }
-  
+
   .login-button {
     padding: 10px;
   }
@@ -267,11 +288,11 @@ export default {
   .login-box {
     padding: 15px;
   }
-  
+
   .login-title {
     font-size: 20px;
   }
-  
+
   .input-group {
     margin-bottom: 15px;
   }

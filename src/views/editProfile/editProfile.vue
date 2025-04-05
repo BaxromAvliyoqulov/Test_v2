@@ -10,17 +10,22 @@
       <div class="form-group">
         <label for="password">Password</label>
         <div class="password-wrapper">
-          <input 
-            :type="showPassword ? 'text' : 'password'" 
-            id="password" 
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            id="password"
             v-model="profile.password"
-            :class="{ 'error': passwordError }"
+            :class="{ error: passwordError }"
             @input="validatePassword"
           />
-          <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" @click="togglePasswordVisibility"
-            id="toggle-password-icon"></i>
+          <i
+            :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
+            @click="togglePasswordVisibility"
+            id="toggle-password-icon"
+          ></i>
         </div>
-        <span class="error-message" v-if="passwordError">{{ passwordError }}</span>
+        <span class="error-message" v-if="passwordError">{{
+          passwordError
+        }}</span>
       </div>
 
       <p class="hintText">* Password o‘zgaradi faqat kiritilgan bo‘lsa</p>
@@ -28,9 +33,9 @@
       <div class="form-group">
         <label for="profilePicture">Profile Photo</label>
         <div class="image-upload-wrapper">
-          <input 
-            type="file" 
-            id="profilePicture" 
+          <input
+            type="file"
+            id="profilePicture"
             @change="onFileChange"
             accept="image/*"
           />
@@ -63,8 +68,8 @@ export default {
       },
       showPassword: false,
       loading: false,
-      passwordError: '',
-      fileError: '',
+      passwordError: "",
+      fileError: "",
       imagePreview: null,
       maxFileSize: 5 * 1024 * 1024, // 5MB
     };
@@ -91,25 +96,25 @@ export default {
     },
     validatePassword() {
       if (this.profile.password && this.profile.password.length < 6) {
-        this.passwordError = 'Password must be at least 6 characters';
+        this.passwordError = "Password must be at least 6 characters";
       } else {
-        this.passwordError = '';
+        this.passwordError = "";
       }
     },
     onFileChange(event) {
       const file = event.target.files[0];
       if (file) {
         if (file.size > this.maxFileSize) {
-          this.fileError = 'File size should not exceed 5MB';
-          event.target.value = '';
+          this.fileError = "File size should not exceed 5MB";
+          event.target.value = "";
           return;
         }
-        if (!file.type.includes('image/')) {
-          this.fileError = 'Please upload an image file';
-          event.target.value = '';
+        if (!file.type.includes("image/")) {
+          this.fileError = "Please upload an image file";
+          event.target.value = "";
           return;
         }
-        this.fileError = '';
+        this.fileError = "";
         this.profile.profilePicture = file;
         this.createImagePreview(file);
       }
@@ -122,51 +127,56 @@ export default {
       reader.readAsDataURL(file);
     },
     async saveProfile() {
-    if (this.loading) return;
-    if (this.passwordError || this.fileError) return;
+      if (this.loading) return;
+      if (this.passwordError || this.fileError) return;
 
-    this.loading = true;
-    try {
-      const auth = getAuth();
-      const user = auth.currentUser;
+      this.loading = true;
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
 
-    if (!user) {
-      alert("User not logged in");
-      return;
-    }
+        if (!user) {
+          alert("User not logged in");
+          return;
+        }
 
-    let photoURL = user.photoURL;
+        let photoURL = user.photoURL;
 
-    if (this.profile.profilePicture) {
-      const imageRef = ref(storage, `profilePics/${user.uid}`);
-      await uploadBytes(imageRef, this.profile.profilePicture);
-      photoURL = await getDownloadURL(imageRef);
-    }
+        if (this.profile.profilePicture) {
+          const imageRef = ref(storage, `profilePics/${user.uid}`);
+          await uploadBytes(imageRef, this.profile.profilePicture);
+          photoURL = await getDownloadURL(imageRef);
+        }
 
-    // ❗️YANGI - setDoc o‘rniga, merge:true bilan
-    await setDoc(doc(db, "users", user.uid), {
-      username: this.profile.username,
-      photoURL,
-      }, { merge: true });
+        // ❗️YANGI - setDoc o‘rniga, merge:true bilan
+        await setDoc(
+          doc(db, "users", user.uid),
+          {
+            username: this.profile.username,
+            photoURL,
+          },
+          { merge: true },
+        );
 
-    await updateProfile(user, {
-      displayName: this.profile.username,
-      photoURL,
-    });
+        await updateProfile(user, {
+          displayName: this.profile.username,
+          photoURL,
 
-    if (this.profile.password) {
-      await updatePassword(user, this.profile.password);
-    }
+     user     
+        });
 
-    alert("Profil yangilandi!");
-  } catch (err) {
-    console.error("Error updating profile:", err);
-    alert("Profilni yangilashda xatolik: " + err.message);
-  } finally {
-    this.loading = false;
-  }
-}
+        if (this.profile.password) {
+          await updatePassword(user, this.profile.password);
+        }
 
+        alert("Profil yangilandi!");
+      } catch (err) {
+        console.error("Error updating profile:", err);
+        alert("Profilni yangilashda xatolik: " + err.message);
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 };
 </script>

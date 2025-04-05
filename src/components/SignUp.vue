@@ -49,78 +49,78 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { auth } from '../config/firebase'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { auth } from "../config/firebase";
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
-  updateProfile
-} from 'firebase/auth'
+  updateProfile,
+} from "firebase/auth";
 
 export default {
   name: "SignUp",
   setup() {
-    const router = useRouter()
-    const username = ref("")
-    const email = ref("")
-    const password = ref("")
-    const showPassword = ref(false)
-    const errorMessage = ref(null)
-    const successMessage = ref(null)
+    const router = useRouter();
+    const username = ref("");
+    const email = ref("");
+    const password = ref("");
+    const showPassword = ref(false);
+    const errorMessage = ref(null);
+    const successMessage = ref(null);
 
     const togglePasswordVisibility = () => {
-      showPassword.value = !showPassword.value
-    }
+      showPassword.value = !showPassword.value;
+    };
 
     const handleSubmit = async () => {
-      errorMessage.value = null
-      successMessage.value = null
+      errorMessage.value = null;
+      successMessage.value = null;
 
       if (!email.value || !password.value || !username.value) {
-        errorMessage.value = "All fields are required"
-        return
+        errorMessage.value = "All fields are required";
+        return;
       }
 
       if (password.value.length > 10) {
-        errorMessage.value = "Password must be less than 10 characters"
-        return
+        errorMessage.value = "Password must be less than 10 characters";
+        return;
       }
 
       try {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email.value,
-          password.value
-        )
+          password.value,
+        );
 
         await updateProfile(userCredential.user, {
-          displayName: username.value
-        })
+          displayName: username.value,
+        });
 
-        console.log("User created and username set:", userCredential.user)
-        successMessage.value = "Sign Up Successfully!"
+        console.log("User created and username set:", userCredential.user);
+        successMessage.value = "Sign Up Successfully!";
 
-        router.push('/')
+        router.push("/");
       } catch (error) {
-        console.error("Error signing up:", error.message)
-        errorMessage.value = "Error: " + error.message
+        console.error("Error signing up:", error.message);
+        errorMessage.value = "Error: " + error.message;
       }
-    }
+    };
 
     const handleGoogleSignUp = async () => {
       try {
-        const provider = new GoogleAuthProvider()
-        const result = await signInWithPopup(auth, provider)
-        console.log("Google Sign Up successful:", result.user)
-        successMessage.value = "Google Sign Up successful!"
-        router.push('/')
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        console.log("Google Sign Up successful:", result.user);
+        successMessage.value = "Google Sign Up successful!";
+        router.push("/");
       } catch (error) {
-        console.error("Google Sign Up failed:", error.message)
-        errorMessage.value = "Google Sign Up Error: " + error.message
+        console.error("Google Sign Up failed:", error.message);
+        errorMessage.value = "Google Sign Up Error: " + error.message;
       }
-    }
+    };
 
     return {
       username,
@@ -131,12 +131,11 @@ export default {
       successMessage,
       togglePasswordVisibility,
       handleSubmit,
-      handleGoogleSignUp
-    }
-  }
-}
+      handleGoogleSignUp,
+    };
+  },
+};
 </script>
-
 
 <style scoped>
 * {
@@ -313,7 +312,7 @@ export default {
     width: 95%;
     padding: 25px;
   }
-  
+
   .signup-title {
     font-size: 22px;
     margin-bottom: 20px;
@@ -330,20 +329,20 @@ export default {
     width: 100%;
     padding: 20px;
   }
-  
+
   .signup-title {
     font-size: 20px;
     margin-bottom: 15px;
   }
-  
+
   .input-group {
     margin-bottom: 15px;
   }
-  
+
   .input-group input {
     padding: 10px;
   }
-  
+
   .signup-button,
   .google-signup button {
     padding: 10px;
@@ -359,31 +358,31 @@ export default {
   .signup-box {
     padding: 15px;
   }
-  
+
   .signup-title {
     font-size: 18px;
   }
-  
+
   .input-group {
     margin-bottom: 12px;
   }
-  
+
   .input-group label {
     font-size: 12px;
   }
-  
+
   .input-group input,
   .signup-button,
   .google-signup button {
     padding: 8px;
     font-size: 12px;
   }
-  
+
   .google-signup img {
     width: 16px;
     height: 16px;
   }
-  
+
   .link-button a {
     font-size: 12px;
   }

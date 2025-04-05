@@ -3,25 +3,52 @@
     <!-- Test Page -->
     <div class="test-page">
       <div class="questionScreen">
-        <h1 class="question">
-          Savol uchun
-        </h1>
+        <h1 class="question">Savol uchun</h1>
         <div class="answers">
-          <input type="radio" class="answer" name="answer" id="answer1" value="1">
+          <input
+            type="radio"
+            class="answer"
+            name="answer"
+            id="answer1"
+            value="1"
+          />
           <label for="answer1">Javob 1</label>
-          <br>
-          <input type="radio" class="answer" name="answer" id="answer2" value="2">
+          <br />
+          <input
+            type="radio"
+            class="answer"
+            name="answer"
+            id="answer2"
+            value="2"
+          />
           <label for="answer2">Javob 2</label>
-          <br>
-          <input type="radio" class="answer" name="answer" id="answer3" value="3">
+          <br />
+          <input
+            type="radio"
+            class="answer"
+            name="answer"
+            id="answer3"
+            value="3"
+          />
           <label for="answer3">Javob 3</label>
-          <br>
-          <input type="radio" class="answer" name="answer" id="answer4" value="4">
+          <br />
+          <input
+            type="radio"
+            class="answer"
+            name="answer"
+            id="answer4"
+            value="4"
+          />
           <label for="answer4">Javob 4</label>
         </div>
         <div class="pagnitation">
-          <button v-for="page in testQuantities" :key="page" class="pagination-button"
-            :class="{ active: currentPage === page }" @click="goToPage(page)">
+          <button
+            v-for="page in testQuantities"
+            :key="page"
+            class="pagination-button"
+            :class="{ active: currentPage === page }"
+            @click="goToPage(page)"
+          >
             {{ page }}
           </button>
         </div>
@@ -38,7 +65,6 @@
 </template>
 
 <script>
-
 export default {
   name: "TestPage",
   data() {
@@ -87,12 +113,15 @@ label {
   border-radius: 5px;
   background-color: white;
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    transform 0.2s ease;
 }
 
 .pagination-button.active {
   color: white;
-  background-color: #007BFF;
+  background-color: #007bff;
   border-color: #0056b3;
   font-weight: bold;
   border: 1px solid transparent;
@@ -108,7 +137,6 @@ label {
   transform: translateY(2px);
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
-
 
 @media (max-width: 768px) {
   .test-page {
