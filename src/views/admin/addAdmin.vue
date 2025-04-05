@@ -26,7 +26,24 @@ export default {
     },
     methods: {
         addAdmin() {
-            // Admin qo'shish logikasi
+            if (!this.username || !this.password) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            const newAdmin = {
+                username: this.username,
+                password: this.password,
+                role: this.role
+            };
+
+            // Simulating an API call
+            alert('Admin added successfully:', newAdmin);
+
+            // Reset form fields
+            this.username = '';
+            this.password = '';
+            this.role = 'admin';
             console.log(`Adding admin: ${this.username}, Role: ${this.role}`);
         }
     }

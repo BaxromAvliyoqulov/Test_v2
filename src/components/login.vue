@@ -4,8 +4,8 @@
       <h2 class="login-title">Login</h2>
       <form @submit.prevent="handleLogin">
         <div class="input-group">
-          <label for="email">Email:</label>
-          <input type="email" id="email" v-model="form.email" required autofocus />
+          <label for="username">Username:</label>
+          <input type="text" id="username" v-model="form.username" required autofocus />
         </div>
         <div class="input-group">
           <label for="password">Password:</label>
@@ -18,7 +18,7 @@
         </div>
         <button type="submit" class="login-button">Login</button>
         <div class="google-login">
-          <button @click.prevent="handleGoogleLogin" type="button">
+          <button @click.prevent="handleGoogleLog" type="button">
             <img src="../assets/img/googleicon.svg" alt="Google Icon" />
             Continue with Google
           </button>
@@ -27,16 +27,35 @@
           <router-link to="/SignUp">Don't have an account? <span>Sign up</span></router-link>
         </div>
       </form>
+
+      <!-- Xatoliklarni ko'rsatish -->
+      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
     </div>
   </div>
 </template>
 
 <script>
+  import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { auth } from '../config/firebase'
+  import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth'
+
 export default {
+  setup() {
+    const router = useRouter()
+    const errorMessage = ref('')
+    const successMessage = ref('')
+
+    return {
+      errorMessage,
+      successMessage,
+      router
+    }
+  },
   data() {
     return {
       form: {
-        email: '',
+        username: '',
         password: ''
       },
       showPassword: false
@@ -44,15 +63,48 @@ export default {
   },
   methods: {
     handleLogin() {
-      console.log('Login attempt:', this.form.email, this.form.password);
+      const { username, password } = this.form;
+
+      // Firebase bilan login
+      signInWithEmailAndPassword(auth, username, password)
+        .then((userCredential) => {
+          // Login muvaffaqiyatli
+          const user = userCredential.user;
+          console.log('Login successful:', user);
+          // Redirect to the home page
+          this.router.push('/');
+        })
+        .catch((error) => {
+          // Xatolik yuz bersa, xato xabarini ko'rsatish
+          this.errorMessage = "Username or password is incorrect. Please try again.";
+          console.error("Login failed:", error.message);
+        });
     },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
-    handleGoogleLogin() {
-      console.log('Google login attempt');
+    async handleGoogleLog() {
+      try {
+        // Google provider yaratish
+        const provider = new GoogleAuthProvider();
+
+        // Google loginni pop-up tarzda ochish
+        const result = await signInWithPopup(auth, provider);
+
+        // Agar login muvaffaqiyatli bo'lsa
+        console.log("Google Log In successful:", result.user);
+        // Success xabarini ko'rsatish
+        this.successMessage = "Google login successful!";
+        // Home sahifasiga yo'naltirish
+        this.router.push('/');
+
+      } catch (error) {
+        // Xatolik yuz bersa
+        console.error("Google LogIn failed:", error.message);
+        this.errorMessage = "Google login error. Please try again.";
+      }
     }
-  }
+  },
 };
 </script>
 
@@ -175,7 +227,6 @@ export default {
   text-align: center;
 }
 
-
 .link-button a {
   color: #333;
   text-decoration: none;
@@ -184,6 +235,17 @@ export default {
 .link-button span {
   color: #007bff;
   font-weight: bold;
+}
+
+/* Error message style */
+.error-message {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  text-align: center;
 }
 
 /* Responsive styles */
@@ -215,4 +277,3 @@ export default {
   }
 }
 </style>
-

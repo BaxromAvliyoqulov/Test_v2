@@ -49,7 +49,7 @@ export default {
             selectedSubject: "",
             selectedLevel: "",
             subjects: ["English", "Math", "Physics", "History"],
-            levels: [ "Beginner","Elementary", "Intermediate", "Advanced"],
+            levels: ["Beginner", "Elementary", "Intermediate", "Advanced"],
             file: null,
             loading: false,
             status: null
@@ -58,8 +58,19 @@ export default {
     methods: {
         updateLevels() {
             // Logic to update levels based on selected subject
-            
-            
+            if (this.selectedSubject === "Math") {
+                this.levels = ["Algebra", "Geometry", "Calculus"];
+            } else if (this.selectedSubject === "Physics") {
+                this.levels = ["Mechanics", "Thermodynamics", "Quantum Physics"];
+            } else if (this.selectedSubject === "History") {
+                this.levels = ["Ancient", "Medieval", "Modern"];
+            } else if (this.selectedSubject === "English") {
+                this.levels = ["Grammar", "Literature", "Writing"];
+            } else {
+                this.levels = ["Beginner", "Elementary", "Intermediate", "Advanced"];
+            }
+
+
         },
         handleFileUpload(event) {
             this.file = event.target.files[0];
@@ -112,10 +123,10 @@ export default {
     max-width: 600px;
     margin: auto;
     padding: 20px;
-    background: #fff;
     border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     text-align: center;
+    background: #fff;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 }
 
 .form-group {
@@ -135,12 +146,12 @@ select {
     padding: 12px 20px;
     font-size: 16px;
     font-weight: bold;
-    background-color: #007BFF;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     margin-top: 10px;
+    background-color: #007BFF;
     transition: background-color 0.3s, transform 0.2s;
 }
 

@@ -40,10 +40,10 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal-content {
@@ -55,7 +55,7 @@ export default {
 }
 
 .input-field {
-    width: 100%;
+    width: 90%;
     padding: 10px;
     margin: 10px 0;
     border-radius: 5px;
@@ -63,7 +63,7 @@ export default {
 }
 
 .login-button {
-    width: 100%;
+    width: 90%;
     padding: 10px;
     background-color: #007BFF;
     color: white;

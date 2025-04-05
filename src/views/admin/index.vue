@@ -7,8 +7,8 @@
       <button class="button" @click="currentView = 'addAdmin'">Add Admin</button>
       <button class="button" @click="currentView = 'addProduct'">Add Product</button>
       <button class="button" @click="logout">
-      <i class="fas fa-sign-out-alt"></i>
-      Logout
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
       </button>
       <!-- Komponentlarni shartli ko'rsatish -->
       <AddSubjectComponent v-if="currentView === 'addSubject'" />
@@ -41,7 +41,7 @@ export default {
       loading: false,
       status: null,
       subjects: ["English", "Math", "Physics", "History"],
-      levels: []
+      levels: ["Beginner"]
     };
   },
   created() {
@@ -88,7 +88,7 @@ export default {
   margin-bottom: 20px;
 }
 
-button{
+button {
   margin-right: 10px;
 }
 </style>

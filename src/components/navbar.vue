@@ -8,12 +8,8 @@
       <div v-if="dropdownOpen" class="dropdown-content">
         <div class="user-info" v-if="username">
           <img :src="profileImage" class="dropdown-profile-image" alt="User Avatar">
-          <router-link to="/dashboard" class="dropdown-username">{{ username }}</router-link>
+          <router-link to="/editProfile" class="dropdown-username">{{ username }}</router-link>
         </div>
-        <router-link to="/shop">
-          <i class="fa-solid fa-cart-shopping"></i>
-          Shop
-        </router-link>
         <div class="dropdown-links">
           <router-link to="/points">
             

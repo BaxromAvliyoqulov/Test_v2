@@ -1,5 +1,5 @@
 <template>
-    <div class="basket" v-if="cart.length > 0">
+    <div class="basket" >
         <h2 class="basket-title">Savatcha</h2>
         <ul class="basket-list">
             <li v-for="item in cart" :key="item.id" class="basket-item">
@@ -30,27 +30,27 @@
 export default {
     name: 'Basket',
     props: {
-        cart: {
-            type: Array,
-            required: true
-        }
+        // cart: {
+        //     type: Array,
+        //     required: true
+        // }
     },
     computed: {
-        total() {
-            return this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        }
+        // total() {
+        //     return this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        // }
     },
-    methods: {
-        updateQuantity(item, change) {
-            this.$emit('update-quantity', { item, change });
-        },
-        removeItem(item) {
-            this.$emit('remove-item', item);
-        },
-        checkout() {
-            this.$emit('checkout');
-        }
-    }
+    // methods: {
+    //     updateQuantity(item, change) {
+    //         this.$emit('update-quantity', { item, change });
+    //     },
+    //     removeItem(item) {
+    //         this.$emit('remove-item', item);
+    //     },
+    //     checkout() {
+    //         this.$emit('checkout');
+    //     }
+    // }
 }
 </script>
 

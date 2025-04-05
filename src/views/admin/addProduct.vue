@@ -21,7 +21,26 @@ export default {
     },
     methods: {
         addProduct() {
-            // Tovar qo'shish logikasi
+            // Add product logic
+            if (!this.productName || this.price <= 0 || !this.description) {
+                alert('Please fill in all fields with valid data.');
+                return;
+            }
+
+            const newProduct = {
+                name: this.productName,
+                price: this.price,
+                description: this.description
+            };
+
+            // Simulate saving the product (e.g., API call)
+            console.log('Product added:', newProduct);
+
+            // Reset form fields
+            this.productName = '';
+            this.price = 0;
+            this.description = '';
+            alert('Product added successfully!');
             console.log(`Adding product: ${this.productName}, Price: ${this.price}`);
         }
     }
@@ -51,7 +70,6 @@ export default {
 .textarea-field {
     height: 100px;
     resize: none;
-    /* Disable resizing */
 }
 
 .submit-button {

@@ -1,17 +1,32 @@
 <template>
-    <div v-if="cart.length > 0">
-        <h2>Savatcha</h2>
-        <ul>
-            <li v-for="item in cart" :key="item.id">
-                {{ item.name }} - {{ item.quantity }} ta
-            </li>
-        </ul>
+    <div class="product-card">
+        <div class="image-container">
+            <img :src="item.image" :alt="item.name" class="product-image">
+            <span v-if="item.tag" class="tag">{{ item.tag }}</span>
+        </div>
+        <div class="product-info">
+            <h3 class="product-name">{{ item.name }}</h3>
+            <p class="product-description">{{ item.description }}</p>
+            <div class="product-footer">
+                <span class="price">{{ item.price }} TP</span>
+                <button @click="$emit('add-to-cart', item)" class="buy-button">
+                    Buy Now
+                </button>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 export default {
-    props: ['cart']
+    name: 'ProductCard',
+    props: {
+        item: {
+            type: Object,
+            required: true
+        }
+    }
+    
 }
 </script>
 
@@ -66,6 +81,7 @@ export default {
     color: #666;
     font-size: 0.9rem;
     margin-bottom: 1rem;
+    line-height: 1.4;
 }
 
 .product-footer {

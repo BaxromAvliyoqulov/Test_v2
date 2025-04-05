@@ -28,7 +28,7 @@
         </div>
         <button type="submit" class="signup-button">Sign Up</button>
       </form>
-      
+
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
 
@@ -52,7 +52,12 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from '../config/firebase'
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  updateProfile
+} from 'firebase/auth'
 
 export default {
   name: "SignUp",
@@ -74,12 +79,12 @@ export default {
       successMessage.value = null
 
       if (!email.value || !password.value || !username.value) {
-        errorMessage.value = "Пожалуйста, заполните все поля"
+        errorMessage.value = "All fields are required"
         return
       }
 
       if (password.value.length > 10) {
-        errorMessage.value = "Пароль не должен превышать 10 символов"
+        errorMessage.value = "Password must be less than 10 characters"
         return
       }
 
@@ -89,13 +94,18 @@ export default {
           email.value,
           password.value
         )
-        console.log("User created:", userCredential.user)
-        successMessage.value = "Регистрация успешна!"
-        
+
+        await updateProfile(userCredential.user, {
+          displayName: username.value
+        })
+
+        console.log("User created and username set:", userCredential.user)
+        successMessage.value = "Sign Up Successfully!"
+
         router.push('/')
       } catch (error) {
         console.error("Error signing up:", error.message)
-        errorMessage.value = "Ошибка: " + error.message
+        errorMessage.value = "Error: " + error.message
       }
     }
 
@@ -104,11 +114,11 @@ export default {
         const provider = new GoogleAuthProvider()
         const result = await signInWithPopup(auth, provider)
         console.log("Google Sign Up successful:", result.user)
-        successMessage.value = "Вход через Google выполнен успешно!"
+        successMessage.value = "Google Sign Up successful!"
         router.push('/')
       } catch (error) {
         console.error("Google Sign Up failed:", error.message)
-        errorMessage.value = "Ошибка входа через Google: " + error.message
+        errorMessage.value = "Google Sign Up Error: " + error.message
       }
     }
 
@@ -126,6 +136,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 * {

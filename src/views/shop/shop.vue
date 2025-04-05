@@ -14,7 +14,6 @@
                 :cart="cart"
                 @update-quantity="updateQuantity"
                 @remove-item="removeFromCart"
-                @checkout="checkout"
             />
         </div>
     </div>
@@ -38,7 +37,7 @@ export default {
                     name: 'Premium Test To\'plami',
                     description: 'Barcha fanlardan maxsus testlar',
                     price: 1500,
-                    image: require('./shopImg/Product1.webp'),
+                    image:new URL('../assets/shopImg/product1.webp', import.meta.url).href,
                     tag: 'Premium'
                 },
                 {
@@ -46,7 +45,7 @@ export default {
                     name: 'Video Darslar',
                     description: 'Professional o\'qituvchilardan video darslar',
                     price: 2000,
-                    image: require('./shopImg/product2.webp'),
+                    image:new URL('../assets/shopImg/product2.webp', import.meta.url).href,
                     tag: 'NEW'
                 },
                 {
@@ -54,10 +53,10 @@ export default {
                     name: 'Study Materials',
                     description: 'O\'quv qo\'llanmalar to\'plami',
                     price: 1000,
-                    image: require('./shopImg/Product3.jpeg')
+                    image:new URL('../assets/shopImg/product3.webp', import.meta.url).href,
                 }
             ],
-            cart: []
+            // cart: []
         };
     },
     methods: {
@@ -86,12 +85,6 @@ export default {
                 this.cart.splice(index, 1);
             }
         },
-        checkout() {
-            // Здесь будет логика оформления заказа
-            console.log('Оформление заказа:', this.cart);
-            // Можно добавить переход на страницу оформления заказа
-            // this.$router.push('/checkout');
-        }
     }
 };
 </script>
