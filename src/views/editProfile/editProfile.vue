@@ -33,13 +33,23 @@
       <div class="form-group">
         <label for="profilePicture">Profile Photo</label>
         <div class="image-upload-wrapper">
+          <div class="avatar-group">
+            <div v-if="currentPhoto">
+              <label>Current Photo</label>
+              <img :src="currentPhoto" class="image-preview" />
+            </div>
+            <div v-if="imagePreview">
+              <label>New Photo</label>
+              <img :src="imagePreview" class="image-preview" />
+            </div>
+          </div>
+
           <input
             type="file"
             id="profilePicture"
             @change="onFileChange"
             accept="image/*"
           />
-          <img v-if="imagePreview" :src="imagePreview" class="image-preview" />
         </div>
         <span class="error-message" v-if="fileError">{{ fileError }}</span>
       </div>
@@ -53,24 +63,25 @@
 </template>
 
 <script>
-import { getAuth, updatePassword, updateProfile } from "firebase/auth";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../../config/firebase.js";
+import { getAuth, updatePassword, updateProfile } from 'firebase/auth';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../../config/firebase.js';
 
 export default {
   data() {
     return {
       profile: {
-        username: "",
-        password: "",
+        username: '',
+        password: '',
         profilePicture: null,
       },
       showPassword: false,
       loading: false,
-      passwordError: "",
-      fileError: "",
+      passwordError: '',
+      fileError: '',
       imagePreview: null,
+      currentPhoto: null,
       maxFileSize: 5 * 1024 * 1024, // 5MB
     };
   },
@@ -80,14 +91,15 @@ export default {
       const user = auth.currentUser;
 
       if (user) {
-        const docSnap = await getDoc(doc(db, "users", user.uid));
+        const docSnap = await getDoc(doc(db, 'users', user.uid));
         if (docSnap.exists()) {
           const data = docSnap.data();
-          this.profile.username = data.username || "";
+          this.profile.username = data.username || '';
+          this.currentPhoto = data.photoURL || null;
         }
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error('Error fetching user data:', error);
     }
   },
   methods: {
@@ -96,25 +108,25 @@ export default {
     },
     validatePassword() {
       if (this.profile.password && this.profile.password.length < 6) {
-        this.passwordError = "Password must be at least 6 characters";
+        this.passwordError = 'Password must be at least 6 characters';
       } else {
-        this.passwordError = "";
+        this.passwordError = '';
       }
     },
     onFileChange(event) {
       const file = event.target.files[0];
       if (file) {
         if (file.size > this.maxFileSize) {
-          this.fileError = "File size should not exceed 5MB";
-          event.target.value = "";
+          this.fileError = 'File size should not exceed 5MB';
+          event.target.value = '';
           return;
         }
-        if (!file.type.includes("image/")) {
-          this.fileError = "Please upload an image file";
-          event.target.value = "";
+        if (!file.type.includes('image/')) {
+          this.fileError = 'Please upload an image file';
+          event.target.value = '';
           return;
         }
-        this.fileError = "";
+        this.fileError = '';
         this.profile.profilePicture = file;
         this.createImagePreview(file);
       }
@@ -136,7 +148,7 @@ export default {
         const user = auth.currentUser;
 
         if (!user) {
-          alert("User not logged in");
+          alert('User not logged in');
           return;
         }
 
@@ -148,31 +160,26 @@ export default {
           photoURL = await getDownloadURL(imageRef);
         }
 
-        // ❗️YANGI - setDoc o‘rniga, merge:true bilan
-        await setDoc(
-          doc(db, "users", user.uid),
-          {
-            username: this.profile.username,
-            photoURL,
-          },
-          { merge: true },
-        );
+        // Update Firestore
+        await updateDoc(doc(db, 'users', user.uid), {
+          username: this.profile.username,
+          photoURL,
+        });
 
+        // Update Firebase Auth Profile
         await updateProfile(user, {
           displayName: this.profile.username,
           photoURL,
-
-     user     
         });
 
         if (this.profile.password) {
           await updatePassword(user, this.profile.password);
         }
 
-        alert("Profil yangilandi!");
+        alert('Profil yangilandi!');
       } catch (err) {
-        console.error("Error updating profile:", err);
-        alert("Profilni yangilashda xatolik: " + err.message);
+        console.error('Error updating profile:', err);
+        alert('Profilni yangilashda xatolik: ' + err.message);
       } finally {
         this.loading = false;
       }
@@ -186,9 +193,10 @@ export default {
   max-width: 500px;
   margin: 0 auto;
   padding: 2rem;
-  background-color: #f9f9f9;
+  background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 90%; /* Responsiv bo'lishi uchun */
 }
 
 .edit-profile h1 {
@@ -290,10 +298,42 @@ button:disabled {
   gap: 1rem;
 }
 
+.avatar-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.avatar-group label {
+  font-size: 0.8rem;
+  margin-bottom: 0.3rem;
+  display: block;
+  color: #666;
+}
+
 .image-preview {
-  max-width: 200px;
-  max-height: 200px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
   object-fit: cover;
-  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #007bff;
+}
+
+@media (max-width: 500px) {
+  .edit-profile {
+    padding: 1rem;
+  }
+
+  .image-preview {
+    width: 80px;
+    height: 80px;
+  }
+
+  button {
+    padding: 0.6rem;
+    font-size: 0.95rem;
+  }
 }
 </style>
