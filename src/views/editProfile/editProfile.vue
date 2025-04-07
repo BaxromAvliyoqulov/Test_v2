@@ -3,60 +3,35 @@
     <h1>Edit Profile</h1>
     <form @submit.prevent="saveProfile">
       <div class="form-group">
-        <label for="username">User Name</label>
-        <input type="text" id="username" v-model="profile.username" />
+        <label for="username">Username</label>
+        <input type="text" id="username" v-model="profile.username" required />
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password">New Password</label>
         <div class="password-wrapper">
           <input
             :type="showPassword ? 'text' : 'password'"
             id="password"
             v-model="profile.password"
-            :class="{ error: passwordError }"
             @input="validatePassword"
+            :class="{ error: passwordError }"
           />
           <i
             :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
             @click="togglePasswordVisibility"
-            id="toggle-password-icon"
+            class="toggle-icon"
           ></i>
         </div>
-        <span class="error-message" v-if="passwordError">{{
+        <small class="hint">* Parol faqat kiritilgan bo‘lsa yangilanadi</small>
+        <span v-if="passwordError" class="error-message">{{
           passwordError
         }}</span>
       </div>
 
-      <p class="hintText">* Password o‘zgaradi faqat kiritilgan bo‘lsa</p>
-
-      <div class="form-group">
-        <label for="profilePicture">Profile Photo</label>
-        <div class="image-upload-wrapper">
-          <div class="avatar-group">
-            <div v-if="currentPhoto">
-              <label>Current Photo</label>
-              <img :src="currentPhoto" class="image-preview" />
-            </div>
-            <div v-if="imagePreview">
-              <label>New Photo</label>
-              <img :src="imagePreview" class="image-preview" />
-            </div>
-          </div>
-
-          <input
-            type="file"
-            id="profilePicture"
-            @change="onFileChange"
-            accept="image/*"
-          />
-        </div>
-        <span class="error-message" v-if="fileError">{{ fileError }}</span>
-      </div>
-
       <button type="submit" :disabled="loading">
         <span v-if="loading">Saving...</span>
-        <span v-else>Save</span>
+        <span v-else>Save Changes</span>
       </button>
     </form>
   </div>
@@ -65,8 +40,8 @@
 <script>
 import { getAuth, updatePassword, updateProfile } from 'firebase/auth';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../../config/firebase.js';
+import { db } from '../../config/firebase';
+import { useRouter } from 'vue-router';
 
 export default {
   data() {
@@ -74,32 +49,24 @@ export default {
       profile: {
         username: '',
         password: '',
-        profilePicture: null,
       },
       showPassword: false,
       loading: false,
       passwordError: '',
-      fileError: '',
-      imagePreview: null,
-      currentPhoto: null,
-      maxFileSize: 5 * 1024 * 1024, // 5MB
     };
   },
   async mounted() {
     try {
       const auth = getAuth();
       const user = auth.currentUser;
-
       if (user) {
-        const docSnap = await getDoc(doc(db, 'users', user.uid));
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          this.profile.username = data.username || '';
-          this.currentPhoto = data.photoURL || null;
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          this.profile.username = userDoc.data().username || '';
         }
       }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
+    } catch (e) {
+      console.error('Error loading user data:', e);
     }
   },
   methods: {
@@ -107,82 +74,45 @@ export default {
       this.showPassword = !this.showPassword;
     },
     validatePassword() {
-      if (this.profile.password && this.profile.password.length < 6) {
-        this.passwordError = 'Password must be at least 6 characters';
-      } else {
-        this.passwordError = '';
-      }
-    },
-    onFileChange(event) {
-      const file = event.target.files[0];
-      if (file) {
-        if (file.size > this.maxFileSize) {
-          this.fileError = 'File size should not exceed 5MB';
-          event.target.value = '';
-          return;
-        }
-        if (!file.type.includes('image/')) {
-          this.fileError = 'Please upload an image file';
-          event.target.value = '';
-          return;
-        }
-        this.fileError = '';
-        this.profile.profilePicture = file;
-        this.createImagePreview(file);
-      }
-    },
-    createImagePreview(file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.imagePreview = e.target.result;
-      };
-      reader.readAsDataURL(file);
+      const pwd = this.profile.password;
+      this.passwordError =
+        pwd && pwd.length < 6 ? 'Password must be at least 6 characters' : '';
     },
     async saveProfile() {
-      if (this.loading) return;
-      if (this.passwordError || this.fileError) return;
-
+      if (this.loading || this.passwordError) return;
       this.loading = true;
+
+      const router = useRouter(); // vue-router orqali redirect
+
       try {
         const auth = getAuth();
         const user = auth.currentUser;
+        if (!user) throw new Error('User not found');
 
-        if (!user) {
-          alert('User not logged in');
-          return;
-        }
-
-        let photoURL = user.photoURL;
-
-        if (this.profile.profilePicture) {
-          const imageRef = ref(storage, `profilePics/${user.uid}`);
-          await uploadBytes(imageRef, this.profile.profilePicture);
-          photoURL = await getDownloadURL(imageRef);
-        }
-
-        // Update Firestore
+        // update Firestore
         await updateDoc(doc(db, 'users', user.uid), {
           username: this.profile.username,
-          photoURL,
         });
 
-        // Update Firebase Auth Profile
+        // update Firebase Auth profile
         await updateProfile(user, {
           displayName: this.profile.username,
-          photoURL,
         });
 
+        // update password if available
         if (this.profile.password) {
           await updatePassword(user, this.profile.password);
         }
 
-        alert('Profil yangilandi!');
+        alert('Profile updated successfully!');
+        this.profile.username = ''; // Clear username field
+        this.profile.password = ''; // Clear password field
       } catch (err) {
-        console.error('Error updating profile:', err);
-        alert('Profilni yangilashda xatolik: ' + err.message);
+        alert('Error: ' + err.message);
       } finally {
         this.loading = false;
       }
+      router.push('/');
     },
   },
 };
@@ -190,149 +120,113 @@ export default {
 
 <style scoped>
 .edit-profile {
-  max-width: 500px;
-  margin: 0 auto;
+  max-width: 420px;
+  margin: auto;
   padding: 2rem;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 90%; /* Responsiv bo'lishi uchun */
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+  font-family: 'Fira Code', monospace;
 }
 
-.edit-profile h1 {
+h1 {
   text-align: center;
-  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
   color: #333;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.form-group label {
+label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-  color: #555;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+  color: #444;
 }
 
-.form-group input {
+input {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.6rem;
+  border-radius: 8px;
   border: 1px solid #ccc;
-  border-radius: 4px;
   font-size: 1rem;
+  transition: border 0.2s;
 }
 
-.form-group input:focus {
+input:focus {
   border-color: #007bff;
   outline: none;
 }
 
-button {
-  display: block;
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
 .password-wrapper {
   position: relative;
-  width: 100%;
 }
 
-.password-wrapper input {
-  width: 100%;
-  padding-right: 2.5rem; /* O‘ng tomonda ikonka uchun joy */
-}
-
-#toggle-password-icon {
+.toggle-icon {
   position: absolute;
-  top: 50%;
   right: 0.75rem;
+  top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  font-size: 1.2rem;
   color: #007bff;
-  transition: color 0.3s;
 }
 
-#toggle-password-icon:hover {
-  color: #0056b3;
-}
-
-.hintText {
-  font-size: 0.9rem;
+.hint {
+  font-size: 0.85rem;
   color: #888;
-  margin-bottom: 1rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 
 .error {
-  border-color: #dc3545;
+  border-color: #dc3545 !important;
 }
 
 .error-message {
   color: #dc3545;
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
 }
 
-.image-upload-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+button {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
-.avatar-group {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
 }
 
-.avatar-group label {
-  font-size: 0.8rem;
-  margin-bottom: 0.3rem;
-  display: block;
-  color: #666;
+button:hover:not(:disabled) {
+  background-color: #0056b3;
 }
 
-.image-preview {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-  border: 2px solid #007bff;
-}
-
-@media (max-width: 500px) {
+@media (max-width: 480px) {
   .edit-profile {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
-  .image-preview {
-    width: 80px;
-    height: 80px;
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  input {
+    font-size: 0.95rem;
   }
 
   button {
-    padding: 0.6rem;
     font-size: 0.95rem;
   }
 }

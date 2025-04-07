@@ -1,25 +1,28 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <h2 class="login-title">Login</h2>
+      <h2 class="login-title">Welcome Back</h2>
+      <p class="login-subtitle">Please enter your credentials to continue</p>
       <form @submit.prevent="handleLogin">
         <div class="input-group">
-          <label for="username">Username:</label>
+          <label for="email">Email</label>
           <input
             type="text"
-            id="username"
+            id="email"
             v-model="form.username"
+            placeholder="Enter your email address"
             required
             autofocus
           />
         </div>
         <div class="input-group">
-          <label for="password">Password:</label>
+          <label for="password">Password</label>
           <div class="password-input-wrapper">
             <input
               :type="showPassword ? 'text' : 'password'"
               id="password"
               v-model="form.password"
+              placeholder="Enter your password"
               required
             />
             <span class="toggle-password" @click="togglePasswordVisibility">
@@ -27,7 +30,8 @@
             </span>
           </div>
         </div>
-        <button type="submit" class="login-button">Login</button>
+        <button type="submit" class="button">Login</button>
+        <div class="separator">or</div>
         <div class="google-login">
           <button @click.prevent="handleGoogleLog" type="button">
             <img src="../assets/img/googleicon.svg" alt="Google Icon" />
@@ -35,151 +39,154 @@
           </button>
         </div>
         <div class="link-button">
-          <router-link to="/SignUp"
-            >Don't have an account? <span>Sign up</span></router-link
-          >
+          <router-link to="/SignUp">
+            Don't have an account? <span>Sign up</span>
+          </router-link>
         </div>
       </form>
-
-      <!-- Xatoliklarni ko'rsatish -->
       <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { auth } from "../config/firebase";
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { auth } from '../config/firebase';
 import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithEmailAndPassword,
-} from "firebase/auth";
+} from 'firebase/auth';
 
 export default {
   setup() {
     const router = useRouter();
-    const errorMessage = ref("");
-    const successMessage = ref("");
+    const errorMessage = ref('');
+    const successMessage = ref('');
+    const form = ref({
+      username: '',
+      password: '',
+    });
+    const showPassword = ref(false);
+
+    const handleLogin = () => {
+      const { username, password } = form.value;
+      signInWithEmailAndPassword(auth, username, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log('Login successful:', user);
+          router.push('/');
+        })
+        .catch((error) => {
+          errorMessage.value =
+            'Username or password is incorrect. Please try again.';
+          console.error('Login failed:', error.message);
+          setTimeout(() => {
+            errorMessage.value = '';
+          }, 5000); // Hide the error message after 5 seconds
+        });
+    };
+
+    const togglePasswordVisibility = () => {
+      showPassword.value = !showPassword.value;
+    };
+
+    const handleGoogleLog = async () => {
+      try {
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        console.log('Google Log In successful:', result.user);
+        successMessage.value = 'Google login successful!';
+        router.push('/');
+      } catch (error) {
+        console.error('Google LogIn failed:', error.message);
+        errorMessage.value = 'Google login error. Please try again.';
+        setTimeout(() => {
+          errorMessage.value = '';
+        }, 5000); // Hide after 5 seconds
+      }
+    };
+
+    // Handle Enter key press to trigger login
+    const handleKeyPress = (event) => {
+      if (event.key === 'Enter') {
+        handleLogin();
+      }
+    };
 
     return {
       errorMessage,
       successMessage,
-      router,
+      form,
+      showPassword,
+      handleLogin,
+      togglePasswordVisibility,
+      handleGoogleLog,
+      handleKeyPress,
     };
-  },
-  data() {
-    return {
-      form: {
-        username: "",
-        password: "",
-      },
-      showPassword: false,
-    };
-  },
-  methods: {
-    handleLogin() {
-      const { username, password } = this.form;
-
-      // Firebase bilan login
-      signInWithEmailAndPassword(auth, username, password)
-        .then((userCredential) => {
-          // Login muvaffaqiyatli
-          const user = userCredential.user;
-          console.log("Login successful:", user);
-          // Redirect to the home page
-          this.router.push("/");
-        })
-        .catch((error) => {
-          // Xatolik yuz bersa, xato xabarini ko'rsatish
-          this.errorMessage =
-            "Username or password is incorrect. Please try again.";
-          console.error("Login failed:", error.message);
-        });
-    },
-    togglePasswordVisibility() {
-      this.showPassword = !this.showPassword;
-    },
-    async handleGoogleLog() {
-      try {
-        // Google provider yaratish
-        const provider = new GoogleAuthProvider();
-
-        // Google loginni pop-up tarzda ochish
-        const result = await signInWithPopup(auth, provider);
-
-        // Agar login muvaffaqiyatli bo'lsa
-        console.log("Google Log In successful:", result.user);
-        // Success xabarini ko'rsatish
-        this.successMessage = "Google login successful!";
-        // Home sahifasiga yo'naltirish
-        this.router.push("/");
-      } catch (error) {
-        // Xatolik yuz bersa
-        console.error("Google LogIn failed:", error.message);
-        this.errorMessage = "Google login error. Please try again.";
-      }
-    },
   },
 };
 </script>
 
 <style scoped>
-* {
-  box-sizing: border-box;
-}
-
 .login-container {
+  min-height: 100%;
   display: flex;
   justify-content: center;
-  padding: 20px;
-  background-color: white;
+  align-items: center;
+  padding: 1.2rem;
 }
 
 .login-box {
+  background-color: #ffffff;
   width: 100%;
-  max-width: 400px;
-  padding: 30px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 420px;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  animation: fadeIn 0.4s ease-in-out;
 }
 
 .login-title {
-  margin-bottom: 20px;
-  color: #333;
-  font-size: 24px;
-  text-align: center;
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 0.1rem;
+  color: #1e3c72;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 1rem;
 }
 
 .input-group {
-  margin-bottom: 20px;
   text-align: left;
+  margin-bottom: 1rem;
 }
 
 .input-group label {
   display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
+  font-weight: 600;
   color: #333;
+  margin-bottom: 5px;
 }
 
 .input-group input {
   width: 100%;
   padding: 12px;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  transition:
-    border 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.3s ease;
 }
 
 .input-group input:focus {
   border-color: #1e3c72;
+  box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.2);
   outline: none;
-  box-shadow: 0 0 5px rgba(30, 60, 114, 0.5);
 }
 
 .password-input-wrapper {
@@ -191,29 +198,15 @@ export default {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  color: #888;
   cursor: pointer;
-  color: #666;
 }
 
-.login-button {
-  width: 100%;
-  padding: 12px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.login-button:hover {
-  background-color: #0056b3;
-}
-
-.google-login {
-  margin-top: 20px;
+.separator {
+  margin: 20px 0;
+  color: #aaa;
+  font-size: 14px;
+  text-transform: uppercase;
 }
 
 .google-login button {
@@ -222,19 +215,17 @@ export default {
   justify-content: center;
   width: 100%;
   padding: 10px;
-  background-color: white;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  transition:
-    background-color 0.3s,
-    border-color 0.3s;
+  transition: all 0.3s ease;
 }
 
 .google-login button:hover {
-  background-color: #f8f8f8;
-  border-color: #999;
+  background-color: #f1f1f1;
 }
 
 .google-login img {
@@ -244,57 +235,78 @@ export default {
 }
 
 .link-button {
-  margin-top: 20px;
-  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 14px;
 }
 
 .link-button a {
-  color: #333;
+  color: #1e3c72;
   text-decoration: none;
 }
 
 .link-button span {
-  color: #007bff;
   font-weight: bold;
+  color: #007bff;
 }
 
-/* Error message style */
 .error-message {
-  margin-top: 15px;
-  padding: 10px;
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  text-align: center;
+  margin-top: 1rem;
+  background-color: #fdecea;
+  color: #d93025;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  animation: fadeOut 5s ease-out forwards;
 }
 
-/* Responsive styles */
+.error-message::before {
+  content: '⚠️ ';
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 @media (max-width: 480px) {
   .login-box {
-    padding: 20px;
+    padding: 1.5rem;
   }
-
-  .input-group input {
-    padding: 10px;
-  }
-
-  .login-button {
-    padding: 10px;
-  }
-}
-
-@media (max-width: 320px) {
-  .login-box {
-    padding: 15px;
-  }
-
   .login-title {
-    font-size: 20px;
+    font-size: 24px;
   }
-
-  .input-group {
-    margin-bottom: 15px;
+  .login-button,
+  input,
+  .google-login button {
+    padding: 10px;
+    font-size: 14px;
+  }
+  .link-button {
+    font-size: 12px;
+  }
+  .error-message {
+    font-size: 12px;
+  }
+  .success {
+    font-size: 12px;
+  }
+  .google-login img {
+    width: 18px;
+    height: 18px;
+  }
+  .google-login button {
+    font-size: 14px;
+  }
+  .separator {
+    font-size: 12px;
   }
 }
 </style>

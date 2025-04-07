@@ -54,8 +54,8 @@
 </template>
 
 <script>
-import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
-import defaultUserImage from "../assets/img/user.png";
+import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
+import defaultUserImage from '../assets/img/user.png';
 
 export default {
   data() {
@@ -68,14 +68,14 @@ export default {
 
   created() {
     this.initializeAuth();
-    document.addEventListener("click", this.handleClickOutside);
+    document.addEventListener('click', this.handleClickOutside);
 
-    // Default rasmni o'rnatish
+    // Default profile image
     this.profileImage = defaultUserImage;
   },
 
   beforeUnmount() {
-    document.removeEventListener("click", this.handleClickOutside);
+    document.removeEventListener('click', this.handleClickOutside);
   },
 
   methods: {
@@ -91,7 +91,7 @@ export default {
     },
 
     handleUserAuthenticated(user) {
-      this.username = user.displayName || user.email || "User";
+      this.username = user.displayName || user.email || 'User';
 
       if (user.photoURL) {
         this.profileImage = user.photoURL;
@@ -105,13 +105,13 @@ export default {
         displayName: user.displayName,
         photoURL: user.photoURL,
       };
-      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem('user', JSON.stringify(userData));
     },
 
     handleUserNotAuthenticated() {
       this.username = null;
       this.profileImage = defaultUserImage;
-      localStorage.removeItem("user");
+      localStorage.removeItem('user');
     },
 
     navigateTo(path) {
@@ -123,7 +123,7 @@ export default {
     },
 
     handleClickOutside(event) {
-      const profileElement = this.$el.querySelector(".profile");
+      const profileElement = this.$el.querySelector('.profile');
       if (profileElement && !profileElement.contains(event.target)) {
         this.dropdownOpen = false;
       }
@@ -135,9 +135,9 @@ export default {
         await signOut(auth);
         this.dropdownOpen = false;
         this.handleUserNotAuthenticated();
-        this.$router.push("/login");
+        this.$router.push('/login');
       } catch (error) {
-        console.error("Logout error:", error);
+        console.error('Logout error:', error);
       }
     },
   },
@@ -160,8 +160,7 @@ export default {
   margin: 15px auto;
   background: linear-gradient(145deg, #0056b3, #007bff);
   color: white;
-  box-shadow:
-    4px 4px 10px rgba(0, 0, 0, 0.3),
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3),
     -4px -4px 10px rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
@@ -185,9 +184,7 @@ export default {
   border-radius: 50%;
   object-fit: cover;
   cursor: pointer;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .profile-image:hover {
@@ -213,8 +210,12 @@ export default {
   padding: 15px;
   background-color: #f8f9fa;
   border-bottom: 1px solid #eee;
+  transition: 0.3s all ease;
+  cursor: pointer;
 }
-
+.user-info:hover .dropdown-profile-image {
+  transform: scale(1.05);
+}
 .dropdown-profile-image {
   width: 36px;
   height: 36px;
@@ -244,9 +245,7 @@ export default {
   text-decoration: none;
   font-size: 16px;
   font-weight: 500;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .dropdown-content a:hover {
@@ -261,7 +260,7 @@ export default {
 }
 
 .custom-hr::after {
-  content: "";
+  content: '';
   display: block;
   height: 1px;
   background: linear-gradient(to right, #007bff, #0056b3);

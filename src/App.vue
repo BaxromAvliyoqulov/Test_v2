@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import MainLayout from "@/layout/mainLayout.vue";
+import MainLayout from '@/layout/mainLayout.vue';
 export default {
   components: {
     MainLayout,
@@ -17,7 +17,7 @@ export default {
 body {
   margin: 0;
   padding: 0;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 a {
   text-decoration: none;
@@ -26,6 +26,7 @@ a {
   font-weight: bold;
 }
 .button {
+  width: 100%;
   padding: 10px 20px;
   font-size: 18px;
   font-weight: 700;
@@ -34,9 +35,7 @@ a {
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition:
-    background-color 0.3s ease,
-    transform 0.2s ease,
+  transition: background-color 0.3s ease, transform 0.2s ease,
     box-shadow 0.2s ease;
   margin-top: 20px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
@@ -58,6 +57,39 @@ a {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
+}
+.separator {
+  margin: 20px 0;
+  color: #aaa;
+  font-size: 14px;
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: 500;
+}
+
+.google-login button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.google-login button:hover {
+  background-color: #f1f1f1;
+}
+
+.google-login img {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
 }
 
 @media (max-width: 768px) {
