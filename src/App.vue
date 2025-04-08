@@ -6,9 +6,28 @@
 
 <script>
 import MainLayout from '@/layout/mainLayout.vue';
+import { onMounted } from 'vue';
+import { auth } from '@/config/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { useRouter } from 'vue-router';
+
 export default {
+  name: 'App',
   components: {
     MainLayout,
+  },
+  setup() {
+    const router = useRouter();
+
+    onMounted(() => {
+      onAuthStateChanged(auth, (user) => {
+        if (!user && router.currentRoute.value.meta.requiresAuth) {
+          router.push('/login');
+        }
+      });
+    });
+
+    return {};
   },
 };
 </script>
@@ -19,12 +38,14 @@ body {
   padding: 0;
   font-family: 'Poppins', sans-serif;
 }
+
 a {
   text-decoration: none;
   color: black;
   font-size: 20px;
   font-weight: bold;
 }
+
 .button {
   width: 100%;
   padding: 10px 20px;
@@ -51,6 +72,7 @@ a {
   transform: translateY(2px);
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
+
 .gradient-text {
   background: linear-gradient(145deg, #0056b3, #007bff);
   -webkit-background-clip: text;
@@ -58,6 +80,7 @@ a {
   background-clip: text;
   color: transparent;
 }
+
 .separator {
   margin: 20px 0;
   color: #aaa;
@@ -93,7 +116,7 @@ a {
 }
 
 @media (max-width: 768px) {
-  button {
+  .button {
     max-width: 100%;
   }
 }
