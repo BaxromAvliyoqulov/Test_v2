@@ -11,8 +11,8 @@
           @change="getTest"
           :class="{ error: submitted && !selectedFan }"
         >
-          <option value="" disabled>Fanlarni Tanlang</option>
-          <option v-for="fan in Fanlar" :key="fan.id" :value="fan">
+          <option value="" disabled>Fanlarni tanlang</option>
+          <option v-for="fan in Fanlar" :key="fan.id" :value="fan.id">
             {{ fan.id }}
           </option>
         </select>
@@ -41,7 +41,7 @@
           v-model="selectedDaraja"
           :class="{ error: submitted && !selectedDaraja }"
         >
-          <option value="" disabled>Darajangizni tanlang</option>
+          <option value="" disabled>Darajani tanlang</option>
           <option v-for="daraja in darajalar" :key="daraja" :value="daraja">
             {{ daraja }}
           </option>
@@ -89,13 +89,13 @@ export default {
       }
     },
     async getTest() {
-      try {
-        if (!this.selectedFan) return;
+      if (!this.selectedFan) return;
+      this.darajalar = [];
 
-        this.darajalar = [];
-        const fanRef = doc(db, 'subjects', this.selectedFan.id);
-        const collections = await getDocs(collection(fanRef, 'levels'));
-        this.darajalar = collections.docs.map((doc) => doc.id);
+      try {
+        const fanRef = doc(db, 'subjects', this.selectedFan);
+        const levelsSnapshot = await getDocs(collection(fanRef, 'levels'));
+        this.darajalar = levelsSnapshot.docs.map((doc) => doc.id);
       } catch (error) {
         console.error('Xatolik:', error);
       }
@@ -109,18 +109,14 @@ export default {
 
       this.isLoading = true;
 
-      // Test ma'lumotlarini tayyorlash
-      // Bu yerda test ma'lumotlarini tayyorlash va saqlash jarayonini qo'shishingiz mumkin
-      const testData = {
-        fan: this.selectedFan.id,
-        testSoni: this.selectedQuantity,
-        daraja: this.selectedDaraja,
-      };
-
-      // Test sahifasiga o'tish
+      // Router orqali query bilan test sahifasiga o'tamiz
       this.$router.push({
         name: 'testPage',
-        params: { testData: JSON.stringify(testData) },
+        query: {
+          fan: this.selectedFan,
+          daraja: this.selectedDaraja,
+          testSoni: this.selectedQuantity,
+        },
       });
     },
   },
@@ -129,6 +125,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .test-selection {
   max-width: 800px;
@@ -165,8 +162,8 @@ select {
   border: 2px solid #e1e8ed;
   border-radius: 8px;
   font-size: 1rem;
-  transition: all 0.3s ease;
   background: white;
+  transition: all 0.3s ease;
 }
 
 select:focus {
@@ -179,10 +176,15 @@ select.error {
   border-color: #dc3545;
 }
 
+.select-start {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
 .start-button {
   width: 100%;
   max-width: 300px;
-  margin: 0 auto;
   padding: 1rem;
   font-size: 1.1rem;
   font-weight: 600;
@@ -232,10 +234,6 @@ select.error {
 
   .selections {
     grid-template-columns: 1fr;
-  }
-
-  select {
-    width: 100%;
   }
 }
 </style>

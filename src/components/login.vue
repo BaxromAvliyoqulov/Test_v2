@@ -131,17 +131,18 @@ export default {
 
 <style scoped>
 .login-container {
-  min-height: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 1.2rem;
+  box-sizing: border-box;
 }
-
 .login-box {
   background-color: #ffffff;
-  width: 100%;
+  width: 90%;
   max-width: 420px;
+  margin: 0 auto;
   padding: 2rem;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -152,19 +153,20 @@ export default {
 .login-title {
   font-size: 26px;
   font-weight: bold;
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.5rem;
   color: #1e3c72;
 }
 
 .login-subtitle {
   font-size: 14px;
   color: #666;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .input-group {
+  width: 100%;
   text-align: left;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
 }
 
 .input-group label {
@@ -175,7 +177,7 @@ export default {
 }
 
 .input-group input {
-  width: 100%;
+  width: 95%;
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -195,18 +197,27 @@ export default {
 
 .toggle-password {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   color: #888;
   cursor: pointer;
 }
 
+.login-button {
+  margin-top: 0.5rem;
+  margin-bottom: 1.8rem;
+}
+
 .separator {
-  margin: 20px 0;
+  margin: 1.5rem 0;
   color: #aaa;
   font-size: 14px;
   text-transform: uppercase;
+}
+
+.google-login {
+  margin-bottom: 1.8rem;
 }
 
 .google-login button {
@@ -235,7 +246,7 @@ export default {
 }
 
 .link-button {
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   font-size: 14px;
 }
 

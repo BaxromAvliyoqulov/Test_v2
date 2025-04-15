@@ -4,7 +4,7 @@
     <form @submit.prevent="addSubject" class="form">
       <div class="form-group">
         <label>Select Subject</label>
-        <select v-model="selectedSubject">
+        <select v-model="selectedSubject" @change="updateLevels">
           <option disabled value="">Choose a subject</option>
           <option v-for="subject in subjects" :key="subject" :value="subject">
             {{ subject }}
@@ -28,6 +28,7 @@
           type="file"
           @change="handleFileUpload"
           accept="application/json"
+          ref="fileInput"
         />
       </div>
 
@@ -44,16 +45,16 @@
 </template>
 
 <script>
-import { db } from "../../config/firebase";
-import { collection, doc, setDoc, addDoc } from "firebase/firestore";
+import { db } from '../../config/firebase';
+import { collection, doc, setDoc, addDoc } from 'firebase/firestore';
 
 export default {
   data() {
     return {
-      selectedSubject: "",
-      selectedLevel: "",
-      subjects: ["English", "Math", "Physics", "History"],
-      levels: ["Beginner", "Elementary", "Intermediate", "Advanced"],
+      selectedSubject: '',
+      selectedLevel: '',
+      subjects: ['English', 'Math', 'Physics', 'History'],
+      levels: ['Beginner', 'Elementary', 'Intermediate', 'Advanced'],
       file: null,
       loading: false,
       status: null,
@@ -61,31 +62,49 @@ export default {
   },
   methods: {
     updateLevels() {
-      // Logic to update levels based on selected subject
-      if (this.selectedSubject === "Math") {
-        this.levels = ["Algebra", "Geometry", "Calculus"];
-      } else if (this.selectedSubject === "Physics") {
-        this.levels = ["Mechanics", "Thermodynamics", "Quantum Physics"];
-      } else if (this.selectedSubject === "History") {
-        this.levels = ["Ancient", "Medieval", "Modern"];
-      } else if (this.selectedSubject === "English") {
-        this.levels = ["Grammar", "Literature", "Writing"];
-      } else {
-        this.levels = ["Beginner", "Elementary", "Intermediate", "Advanced"];
+      const previousLevel = this.selectedLevel; // Saqlab qo'yish
+      if (this.selectedSubject === 'Math') {
+        this.levels = ['Beginner', 'Elementary', 'Intermediate', 'Advanced'];
+      } else if (this.selectedSubject === 'Physics') {
+        this.levels = ['Beginner', 'Elementary', 'Intermediate', 'Advanced'];
+      } else if (this.selectedSubject === 'History') {
+        this.levels = ['Beginner', 'Elementary', 'Intermediate', 'Advanced'];
+      } else if (this.selectedSubject === 'English') {
+        this.levels = ['Beginner', 'Elementary', 'Intermediate', 'Advanced'];
       }
+      // Tanlangan darajani saqlab qolish
+      this.selectedLevel = previousLevel;
     },
     handleFileUpload(event) {
       this.file = event.target.files[0];
+      if (this.file && this.file.type !== 'application/json') {
+        alert('Please upload a valid JSON file!');
+        this.file = null;
+      }
     },
     async addSubject() {
       this.loading = true;
       this.status = null;
+
+      // Bo'sh qiymatlar tekshirilmoqda
+      if (!this.selectedSubject || !this.selectedLevel) {
+        this.status = {
+          type: 'error',
+          message: '❌ Please select both subject and level!',
+        };
+        setTimeout(() => {
+          this.status = null;
+        }, 3000);
+        this.loading = false;
+        return;
+      }
+
       try {
-        const subjectRef = doc(db, "subjects", this.selectedSubject);
+        const subjectRef = doc(db, 'subjects', this.selectedSubject);
         await setDoc(
           subjectRef,
           { name: this.selectedSubject, level: this.selectedLevel },
-          { merge: true },
+          { merge: true }
         );
 
         if (this.file) {
@@ -97,17 +116,25 @@ export default {
                 throw new Error("JSON massiv bo'lishi kerak!");
               if (
                 !parsedData.every(
-                  (item) => item.question && item.options && item.answer,
+                  (item) => item.question && item.options && item.answer
                 )
               ) {
                 throw new Error(
-                  "Har bir test obyektida 'question', 'options', va 'answer' bo'lishi kerak!",
+                  "JSON format noto'g'ri: har bir testda 'question', 'options', va 'answer' bo'lishi kerak!"
                 );
               }
+
+              // Daraja va predmetni to'g'ri pathga uzatish
               const levelCollectionRef = collection(
                 subjectRef,
-                this.selectedLevel,
+                this.selectedLevel
               );
+
+              // Agar collection bo'sh bo'lsa, xatolik chiqariladi
+              if (!levelCollectionRef) {
+                throw new Error('Collection path is empty!');
+              }
+
               for (const test of parsedData) {
                 await addDoc(levelCollectionRef, {
                   question: test.question,
@@ -115,26 +142,42 @@ export default {
                   answer: test.answer,
                 });
               }
+
               this.status = {
-                type: "success",
-                message: "✅ Subject and tests added successfully!",
+                type: 'success',
+                message: '✅ Subject and tests added successfully!',
               };
+              setTimeout(() => {
+                this.status = null;
+              }, 3000);
             } catch (error) {
               console.error("❌ JSON faylni o'qishda xatolik:", error);
               this.status = {
-                type: "error",
-                message: "❌ Xatolik: Noto'g'ri JSON fayl!",
+                type: 'error',
+                message: `❌ ${error.message}`,
               };
+              setTimeout(() => {
+                this.status = null;
+              }, 3000);
             }
           };
           reader.readAsText(this.file);
         }
       } catch (error) {
-        console.error("❌ Error adding subject:", error);
-        this.status = { type: "error", message: "❌ Error adding subject!" };
+        console.error('❌ Error adding subject:', error);
+        this.status = { type: 'error', message: '❌ Error adding subject!' };
+        setTimeout(() => {
+          this.status = null;
+        }, 3000);
       } finally {
         this.loading = false;
       }
+
+      // Tozalash
+      this.selectedLevel = '';
+      this.selectedSubject = '';
+      this.file = null;
+      this.$refs.fileInput.value = null;
     },
   },
 };
@@ -174,9 +217,7 @@ select {
   cursor: pointer;
   margin-top: 10px;
   background-color: #007bff;
-  transition:
-    background-color 0.3s,
-    transform 0.2s;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .btn:hover {

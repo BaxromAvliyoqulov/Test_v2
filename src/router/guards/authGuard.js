@@ -1,23 +1,30 @@
 import { auth } from '@/config/firebase';
 
-export const authGuard = (to, from, next) => {
-  const user = auth.currentUser;
+export const authGuard = async (to, from, next) => {
+  // Дождемся инициализации Firebase Auth
+  await new Promise((resolve) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      unsubscribe();
+      resolve(user);
+    });
+  });
 
-  // Protect all routes except login and register
+  const user = auth.currentUser;
   const publicPages = ['/login', '/register'];
   const authRequired = !publicPages.includes(to.path);
 
+  // Если требуется авторизация и пользователь не авторизован
   if (authRequired && !user) {
-    // If user tries to access protected route without auth
     next('/login');
     return;
   }
 
-  // If authenticated user tries to access login/register
+  // Если пользователь авторизован и пытается зайти на страницы логина/регистрации
   if (user && publicPages.includes(to.path)) {
     next('/');
     return;
   }
 
+  // В остальных случаях разрешаем переход
   next();
 };

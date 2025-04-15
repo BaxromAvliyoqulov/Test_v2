@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { authGuard } from './guards/authGuard';
 import home from '@/views/home.vue';
-// Importing components for lazy loading
+
+// Lazy-loaded components
 const Login = () => import('@/components/login.vue');
 const SignUP = () => import('@/components/SignUp.vue');
 const testPage = () => import('@/views/testPage.vue');
@@ -13,78 +14,83 @@ const points = () => import('@/views/points.vue');
 const NotFound = () => import('@/views/404.vue');
 const EditProfile = () => import('@/views/editProfile/editProfile.vue');
 
-// Importing the authGuard for route protection
+// Router instance
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
       name: 'home',
-      component: () => import('../views/home.vue'),
+      component: home,
       meta: { requiresAuth: true },
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import('../components/login.vue'),
+      component: Login,
+      meta: { requiresAuth: false },
     },
     {
-      path: '/',
-      name: 'home',
-      component: home,
+      path: '/signup',
+      name: 'SignUp',
+      component: SignUP,
+      meta: { requiresAuth: false },
     },
     {
-      path: '/test',
-      name: 'testPage',
+      path: '/test/:subject/:level',
+      name: 'TestPage',
       component: testPage,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin',
       name: 'admin',
       component: admin,
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: Login,
-    },
-    {
-      path: '/SignUp',
-      name: 'SignUp',
-      component: SignUP,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true, // Добавляем специальную защиту для админ панели
+      },
     },
     {
       path: '/about',
       name: 'aboutUs',
       component: about,
+      meta: { requiresAuth: false }, // Публичная страница
     },
     {
-      path: '/contactUs',
+      path: '/contact-us',
       name: 'contactUs',
       component: contactUs,
+      meta: { requiresAuth: false }, // Публичная страница
     },
     {
       path: '/dashboard',
       name: 'dashboard',
       component: dashboard,
+      meta: { requiresAuth: true },
     },
     {
       path: '/points',
       name: 'points',
       component: points,
+      meta: { requiresAuth: true },
     },
     {
-      path: '/404',
-      name: 'NotFound',
-      component: NotFound,
-    },
-    {
-      path: '/editProfile',
+      path: '/edit-profile',
       name: 'editProfile',
       component: EditProfile,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/:catchAll(.*)',
+      name: 'NotFound',
+      component: NotFound,
+      meta: { requiresAuth: false },
     },
   ],
 });
-// Apply authentication guard
+
+// Auth guard
 router.beforeEach(authGuard);
+
 export default router;

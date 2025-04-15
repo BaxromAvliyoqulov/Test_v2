@@ -21,7 +21,12 @@
             username
           }}</router-link>
         </div>
+
         <div class="dropdown-links">
+          <router-link to="/">
+            <i class="fas fa-home"></i>
+            Home
+          </router-link>
           <router-link to="/points">
             <img
               src="../assets/img/tpCoin.png"
@@ -189,7 +194,7 @@ export default {
 
 .profile-image:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0px 10px rgba(255, 255, 255, 0.651);
 }
 
 .dropdown-content {
